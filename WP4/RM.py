@@ -1,6 +1,7 @@
 from Users import Role
 from cryptography.hazmat.primitives.asymmetric import rsa
 from Interfaces import Comunication
+from cryptOp import PiAsim
 
 class RM(Comunication):
     _role = None
@@ -10,7 +11,6 @@ class RM(Comunication):
 
     def __init__(self, ca):
         self._role = Role.RM
-        self._kpriv = rsa.generate_private_key()
-        self._kpub = self._kpriv.public_key()
+        self._kpriv , self._kpub = PiAsim.GenAsim(2048)
         self._ID = ca.subscribeRM(self, self._kpub)
 

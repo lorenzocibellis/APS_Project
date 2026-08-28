@@ -1,6 +1,6 @@
 from enum import StrEnum
 from Interfaces import Comunication
-from cryptOp import piAsim
+from cryptOp import PiAsim
 
 class Role(StrEnum):
     CLINICA = "Clinica"
@@ -23,7 +23,7 @@ class User(Comunication):
     def obtainIdentity(self,ca):
         if not self._identity:
 
-            self._kpriv , self._kpub = piAsim.genAsim(2048)
+            self._kpriv , self._kpub = PiAsim.GenAsim(2048)
             self._ID = ca.subscribeUser(self , self._role , self._kpub)
             self._identity = True
             return

@@ -3,7 +3,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.fernet import Fernet
 
-class piSim:
+class PiSim:
     def genSim():
         return Fernet.generate_key()
 
@@ -19,8 +19,8 @@ class piSim:
 
 
 
-class piAsim:
-    def genAsim(n = 2048):
+class PiAsim:
+    def GenAsim(n = 2048):
         priv = rsa.generate_private_key(
             public_exponent = 65537,
             key_size = n
@@ -28,7 +28,7 @@ class piAsim:
         pub = priv.public_key()
         return priv,pub
 
-    def encAsim(k , plain):
+    def EncAsim(k , plain):
         cipher = k.encrypt(
             plain,
             padding.OAEP(
@@ -39,7 +39,7 @@ class piAsim:
         )
         return cipher
 
-    def decAsim(k , cipher):
+    def DecAsim(k , cipher):
         plain = k.decrypt(
             cipher,
             padding.OAEP(
