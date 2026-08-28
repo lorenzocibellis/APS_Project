@@ -4,15 +4,15 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.fernet import Fernet
 
 class PiSim:
-    def genSim():
+    def GenSim():
         return Fernet.generate_key()
 
-    def encSim(k , plain):
+    def EncSim(k , plain):
         f = Fernet(k)
         cipher = f.encrypt(plain)
         return cipher
 
-    def decSim(k , cipher):
+    def DecSim(k , cipher):
         f = Fernet(k)
         plain = f.decrypt(cipher)
         return plain
