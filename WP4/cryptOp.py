@@ -1,3 +1,4 @@
+from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.fernet import Fernet
@@ -52,14 +53,40 @@ class piAsim:
 
 class H:
     def Hash(value):
-        return
+        digest = hashes.Hash(hashes.SHA256())
+        digest.update(value)
+        hash = digest.finalize()
+        return digest
 
     def HVrfy(value, hash):
-        return
+        digest = hashes.Hash(hashes.SHA256())
+        digest.update(value)
+        newhash = digest.finalize()
+        return newhash == hash
 
 class S:
     def Sign(k, value):
-        return
+        sign = k.sign(
+            value,
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashes.SHA256()
+        )
+        return sign
 
     def Vrfy(k, value, sign):
-        return
+        try:
+            k.verify(
+                sign,
+                value,
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
+            return True
+        except InvalidSignature:
+            return False
