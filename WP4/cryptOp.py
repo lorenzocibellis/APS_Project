@@ -1,15 +1,20 @@
-from cryptography.hazmat.primitives.asymmetric import rsa
-
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.fernet import Fernet
 
 class piSim:
     def genSim():
-        return
+        return Fernet.generate_key()
 
-    def encSim():
-        return
+    def encSim(k , plain):
+        f = Fernet(k)
+        cipher = f.encrypt(plain)
+        return cipher
 
-    def decSim():
-        return
+    def decSim(k , cipher):
+        f = Fernet(k)
+        plain = f.decrypt(cipher)
+        return plain
 
 
 
@@ -22,11 +27,27 @@ class piAsim:
         pub = priv.public_key()
         return priv,pub
 
-    def encAsim():
-        return
+    def encAsim(k , plain):
+        cipher = k.encrypt(
+            plain,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+        return cipher
 
-    def decAsim():
-        return
+    def decAsim(k , cipher):
+        plain = k.decrypt(
+            cipher,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+        return plain
 
 
 class H:
