@@ -4,10 +4,11 @@ from Users import Role
 class CA:
 
     #inizializzazione del database degli utenti
-    def __initialite__(self):
+    def __initialite__(self, rm):
         self.pdict = dict()
         self.cdict = dict()
         self.mdict = dict()
+        self.rm = (rm._ID , rm._role , rm._kpub)
 
 
     def subscribeUser(self, user, role, kpub):
@@ -30,7 +31,9 @@ class CA:
 
     def getPublic(self, ID):
         r = ID[0]
-        if r == "C":
+        if ID == self.rm[0]:
+            return [1]
+        elif r == "C":
             return self.cdict[ID][0]
         elif r == "P":
             return self.pdict[ID][0]
@@ -41,7 +44,9 @@ class CA:
 
     def getRole(self,ID):
         r = ID[0]
-        if r == "C":
+        if ID == self.rm[0]:
+            return [2]
+        elif r == "C":
             return self.cdict[ID][1]
         elif r == "P":
             return self.pdict[ID][1]
