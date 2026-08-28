@@ -8,8 +8,15 @@ class CA:
         self.pdict = dict()
         self.cdict = dict()
         self.mdict = dict()
-        self.rm = (rm._ID , rm._role , rm._kpub)
 
+
+
+    def subscribeRM(self, rm, kpub):
+        if kpub == None:
+            raise ValueError
+        id = "RM0"
+        self.rm = (id , rm._role , rm._kpub)
+        return "id
 
     def subscribeUser(self, user, role, kpub):
         #Controllo sulla chiave pubblica dell'utente

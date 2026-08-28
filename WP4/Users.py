@@ -1,6 +1,6 @@
 from enum import StrEnum
-from Comunication import Comunication
-from cryptography.hazmat.primitives.asymmetric import rsa
+from Interfaces import Comunication
+from cryptOp import piAsim
 
 class Role(StrEnum):
     CLINICA = "Clinica"
@@ -22,14 +22,19 @@ class User(Comunication):
     #inizializzazione identità presso una CA
     def obtainIdentity(self,ca):
         if not self._identity:
-            self.kpriv = rsa.generate_private_key(
-                key_size=2048,
-                public_exponent=65537
-            )
-            self.kpub = self.kpriv.public_key()
-            self.id = ca.subscribeUser(self , self._role , self._kpub)
+
+            self._kpriv , self._kpub = piAsim.genAsim(2048)
+            self._ID = ca.subscribeUser(self , self._role , self._kpub)
             self._identity = True
             return
         print("Identità già inizializzata")
 
 
+
+class Clinica(User):
+
+
+class Paziente(User):
+
+
+class Medico(User):
