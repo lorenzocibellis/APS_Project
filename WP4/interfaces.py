@@ -18,6 +18,7 @@ class Comunication:
     _cntout = dict()
     _cntin = dict()
     _cc = None
+    _ca = None
 
     _auditOp = ["00" , "01" , "05" , "07" , "08"]
 
@@ -56,7 +57,7 @@ class Comunication:
         self._cntupdatein(ID, 0)
 
 
-    def send(self, dest, m, audit = None):
+    def send(self, dest, m):
 
         if dest not in self._cntout:
             self._cntinitializeout(dest)
@@ -87,9 +88,7 @@ class Comunication:
 
         # operazione Audit
         if op in self._auditOp:
-            if audit is None:
-                raise ValueError
-            audit.append(cnt)
+            audit = [m[0] , m[1] , cnt]
             audit = Serializer.serialize(audit)
             signaudit = S.Sign(self._kpriv, audit)
             msign.insert(0,signaudit)
@@ -158,8 +157,14 @@ class Comunication:
         print("messaggio autenticato e validato")
 
         if flag:
-            return m , op , audit , signaudit
+            return m , op , kpub , cnt, signaudit
 
-        return m , op
+        return m , op, kpub
 
 
+class User(Comunication):
+    #metodo che permette la cifratura di una chiave usando 2 chiavi diverse tramite cifrtura asimmetrica
+    def _doublecrit(self,k, k1, k2):
+        k1c = PiAsim.EncAsim(k,k1)
+        k2c = PiAsim.EncAsim(k,k2)
+        return k1c,k2c

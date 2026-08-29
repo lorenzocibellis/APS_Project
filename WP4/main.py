@@ -1,3 +1,4 @@
+from CentralSystem.data.database import Database
 from CentralSystem.data.register import Register
 from CentralSystem.data.audit import Audit
 from CentralSystem.rm import RM
@@ -14,8 +15,17 @@ d = r.serialize()
 print(d)
 l = r.deserialize(d)
 
-
+db = Database
 ca = CA()
-rm = RM(Role.RM , ca)
+rm = RM(Role.RM , ca, db)
 m = ("RM0", "00" , 21, 12, [0,0,0,0])
-rm.send(rm._ID, m , [m[0], m[1]])
+rm.send(rm._ID, m)
+
+
+while 1:
+    flag = input("Inviare messaggio?")
+    if flag:
+        rm.send(rm._ID, m )
+        print("Messaggio non inviato")
+    else:
+        print("Messaggio non inviato")
