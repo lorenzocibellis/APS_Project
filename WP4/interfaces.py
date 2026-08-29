@@ -87,6 +87,9 @@ class Comunication:
 
         # operazione Audit
         if op in self._auditOp:
+            if audit is None:
+                raise ValueError
+            audit.append(cnt)
             audit = Serializer.serialize(audit)
             signaudit = S.Sign(self._kpriv, audit)
             msign.insert(0,signaudit)
@@ -135,6 +138,7 @@ class Comunication:
         # passo 5.5
         if signaudit is not None:
             audit = [m[0] , m[1] , cnt]
+            audit = Serializer.serialize(audit)
             if not S.Vrfy(kpub, audit, signaudit):
                 raise ValueError("Errore nella firma dell'audit")
             print("Firma Audit verificata")
