@@ -1,6 +1,6 @@
 from enum import StrEnum
-from Interfaces import Comunication
-from cryptOp import PiAsim
+from interfaces import Comunication
+from cryptoOperation.cryptOp import PiAsim
 
 class Role(StrEnum):
     CLINICA = "Clinica"

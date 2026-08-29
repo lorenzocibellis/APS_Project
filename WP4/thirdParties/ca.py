@@ -1,4 +1,4 @@
-from Users import Role
+from users import Role
 
 #Certificate Authority
 class CA:
@@ -16,7 +16,7 @@ class CA:
             raise ValueError
         id = "RM0"
         self.rm = (id , rm._role , rm._kpub)
-        return "id
+        return id
 
     def subscribeUser(self, user, role, kpub):
         #Controllo sulla chiave pubblica dell'utente

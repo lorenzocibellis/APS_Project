@@ -3,15 +3,20 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.fernet import Fernet
 
+
 class PiSim:
+
+    @staticmethod
     def GenSim():
         return Fernet.generate_key()
 
+    @staticmethod
     def EncSim(k , plain):
         f = Fernet(k)
         cipher = f.encrypt(plain)
         return cipher
 
+    @staticmethod
     def DecSim(k , cipher):
         f = Fernet(k)
         plain = f.decrypt(cipher)
@@ -20,6 +25,8 @@ class PiSim:
 
 
 class PiAsim:
+
+    @staticmethod
     def GenAsim(n = 2048):
         priv = rsa.generate_private_key(
             public_exponent = 65537,
@@ -28,6 +35,7 @@ class PiAsim:
         pub = priv.public_key()
         return priv,pub
 
+    @staticmethod
     def EncAsim(k , plain):
         cipher = k.encrypt(
             plain,
@@ -39,6 +47,7 @@ class PiAsim:
         )
         return cipher
 
+    @staticmethod
     def DecAsim(k , cipher):
         plain = k.decrypt(
             cipher,
@@ -52,12 +61,15 @@ class PiAsim:
 
 
 class H:
+
+    @staticmethod
     def Hash(value):
         digest = hashes.Hash(hashes.SHA256())
         digest.update(value)
         hash = digest.finalize()
-        return digest
+        return hash
 
+    @staticmethod
     def HVrfy(value, hash):
         digest = hashes.Hash(hashes.SHA256())
         digest.update(value)
@@ -65,6 +77,8 @@ class H:
         return newhash == hash
 
 class S:
+
+    @staticmethod
     def Sign(k, value):
         sign = k.sign(
             value,
@@ -76,6 +90,7 @@ class S:
         )
         return sign
 
+    @staticmethod
     def Vrfy(k, value, sign):
         try:
             k.verify(
