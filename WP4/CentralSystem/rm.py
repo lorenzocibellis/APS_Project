@@ -1,50 +1,52 @@
-from cryptoOperation.cryptOp import PiAsim
 from interfaces import Comunication
 from CentralSystem.data.database import Database
-
+from globalClasses.enumerations import OperationCode as oc, NotifyCode as nc
 class RM(Comunication):
 
 
-    def __init__(self, role, ca, db):
+    def __init__(self, role, ca, db: Database):
         super().__init__(role, ca)
         self._db = db
 
 
     def receive(self, c):
-        m , op , kpub, cnt, signaudit = super().receive(c)
-        if op == "00":
-            message = self.store(m, cnt, signaudit)
-        elif op == "01":
-            self.getRef(m, cnt, signaudit)
-        elif op == "05":
-            self.getKey(m, cnt, signaudit)
-        elif op == "07":
-            self.revoke(m, cnt, signaudit)
-        elif op == "08":
-            self.revoke(m, cnt, signaudit)
-        elif op == "09":
-            self.getAuditing(m, cnt, signaudit)
+        data = super().receive(c)
+        if data is None:
+            return
+        m, sender, op, kpub, cnt, signaudit = data
+        print("Elaborazione della richiesta")
+        if op == oc.STORE:
+            self._store(m, cnt, signaudit)
+        elif op == oc.REF_REQ:
+            self._getRef(m, cnt, signaudit)
+        elif op == oc.KEY_REQ:
+            self._getKey(m, cnt, signaudit)
+        elif op == oc.REVOKE:
+            self._revoke(m, cnt, signaudit)
+        elif op == oc.UPDATE:
+            self._revoke(m, cnt, signaudit)
+        elif op == oc.AUD_REQ:
+            self._getAuditing(m, cnt, signaudit)
         else:
-            ValueError("Codice non valido")
+            response = self._notifyMessage(sender ,nc.INVALID)
 
-        print("Richiesta elaborata")
+        print("RM : Richiesta elaborata")
+
+        print("RM : Invio messaggio di risposta")
 
 
-
-    def store(self, m, cnt ,signaudit):
+    def _store(self, m, cnt ,signaudit):
         if len(m) != 5:
            raise ValueError("Lunghezza del pacchetto errata")
         print(m)
         IDclinica, _ , IDpaziente , IDreferto, DdR = m
         ksimc, ksimp , trev, creferto = DdR
-        error = self._db._addItem(IDpaziente, IDreferto, IDclinica, ksimp, ksimc, None, None ,trev, None, creferto)
-        if error is "00":
-            self._db.addAudit(IDpaziente, IDreferto, IDclinica, "00", cnt, signaudit)
-        return self._noteMessage(m[0], error)
+        error = self._db.addItem(IDpaziente, IDreferto, IDclinica, ksimp, ksimc, None, None, trev, None, creferto)
+        if error == nc.SUCCESS:
+            self._db.addAudit(IDpaziente, IDreferto, IDclinica, oc.STORE, cnt, signaudit)
+        self._notifyMessage(IDclinica ,error)
 
 
-
-
-    def _noteMessage(self,dest , code):
-        return [dest , "11" , code]
-
+    def _notifyMessage(self, receiver, code):
+        message = [self._ID, oc.NOTIFY, code]
+        self.send(receiver, message)

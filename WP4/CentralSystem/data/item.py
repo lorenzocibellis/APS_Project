@@ -6,7 +6,7 @@ class Item:
         self._IDreferto = IDreferto
         self._clinica = IDclinica
         self._ksimpaziente = ksimpaziente
-        self._ksimclinca = ksimclinica
+        self._ksimclinica = ksimclinica
         self._krevpaziente = krevpaziente
         self._krevclinica = krevclinica
         self._flagRevoca = False
@@ -44,5 +44,24 @@ class Item:
     def getIDreferto(self):
         return self._IDreferto
 
-    def addAudit(self,audit, signaudit):
-        self._register.addAudit(audit, signaudit)
+    def addAudit(self,audit):
+        self._register.addAudit(audit)
+
+    def __str__(self):
+        stato_revoca = "REVOCATO" if self._flagRevoca else "ATTIVO"
+
+        return (
+            f"=== Item Referto [{self._IDreferto}] ===\n"
+            f"  • Paziente ID:       {self._IDpaziente}\n"
+            f"  • Clinica ID:        {self._clinica}\n"
+            f"  • Stato:             {stato_revoca}\n"
+            f"  • Token validazione Revoca:  {self._trev}\n"
+            f"  • KSim Paziente:     {self._ksimpaziente}\n"
+            f"  • KSim Clinica:      {self._ksimclinica}\n"
+            f"  • KRev Paziente:     {self._krevpaziente}\n"
+            f"  • KRev Clinica:      {self._krevclinica}\n"
+            f"  • Cifrato Referto:   {self._creferto}\n"
+            f"  • Cifrato Revoca:    {self._crevoca}\n"
+            f"  • Registro Audit:    {self._register}\n"
+            f"================================="
+        )

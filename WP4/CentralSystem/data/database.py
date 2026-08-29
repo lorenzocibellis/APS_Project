@@ -7,13 +7,17 @@ class Database:
     def __init__(self):
         self._database = dict()
 
-    def addItem(self, IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica,trev, crevoca, creferto):
+    def addItem(self, IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica,trev, crevoca, creferto , verbose = False):
         item = Item(IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica, trev, crevoca, creferto)
-        if item in self._database:
+        if item in self:
             return "01"
         if IDpaziente not in self._database:
             self._database[IDpaziente] = dict()
         self._database[IDpaziente][IDreferto] = item
+
+        #modalità verbose
+        if verbose:
+            print("\nAggiunto item:\n" + str(item) +"\n")
         return "00"
 
     def revokeItem(self, IDpaziente, IDreferto, krevpaziente, krevclinica, trev, crevoca):
@@ -33,7 +37,7 @@ class Database:
         self._database[IDpaziente][IDreferto].updateItem(ksimpaziente, ksimclinica, trev, creferto)
         return "00"
 
-    def addAudit(self,IDpaziente,IDreferto,ID, op, cnt, signaudit):
+    def addAudit(self,IDpaziente,IDreferto,ID, op, cnt, signaudit ):
         item = self._database[IDpaziente][IDreferto]
         item.addAudit( Audit(ID, op, cnt, signaudit) )
 
@@ -54,7 +58,7 @@ class Database:
         p , r = item.getIDpaziente() , item.getIDreferto()
         if p not in self._database:
             return False
-        if r not in self._database:
+        if r not in self._database[p]:
             return False
         return self._database[p][r] is not None
 

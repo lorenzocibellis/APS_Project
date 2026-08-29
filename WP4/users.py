@@ -1,16 +1,9 @@
 import random
-from enum import StrEnum
 
 from cryptoOperation.serializer import Serializer
 from interfaces import User
 from cryptoOperation.cryptOp import PiSim, PiAsim, S
-
-class Role(StrEnum):
-    CLINICA = "Clinica"
-    PAZIENTE = "Paziente"
-    MEDICO = "Medico"
-    RM = "Request Manager"
-
+from globalClasses.enumerations import OperationCode as oc, Role
 
 
 class Clinica(User):
@@ -18,6 +11,7 @@ class Clinica(User):
     def __init__(self,ca, rm):
         super().__init__(Role.CLINICA,ca)
         self._rm = rm
+
 
     def createRefertoCifrato(self,IDpaziente, IDreferto ,referto):
         #generazione chiave simmetrica
@@ -46,8 +40,7 @@ class Clinica(User):
 
         message = [self._ID, "00", IDpaziente, IDreferto, DdR]
 
-        IDrm
-
+        IDrm = self._ca.getRMID()
         self.send(IDrm, message)
 
 

@@ -1,38 +1,36 @@
+from io import UnsupportedOperation
+
 from cryptoOperation.cryptOp import PiAsim, PiSim, S
 from cryptoOperation.serializer import Serializer
-from thirdParties.comunicationChannel import ComunicationChannel
-
-class Referto:
-    data = None
-
-    def __init__(self,data):
-        self.data = data
+from globalClasses.enumerations import OperationCode as oc, NotifyCode as nc
 
 
 class Comunication:
-    _role = None
-    _ID = None
-    _kpriv = None
-    _kpub = None
-    _identity = False
-    _cntout = dict()
-    _cntin = dict()
-    _cc = None
-    _ca = None
 
-    _auditOp = ["00" , "01" , "05" , "07" , "08"]
+    _auditOp = [oc.STORE , oc.REF_REQ , oc.KEY_REQ , oc.REVOKE , oc.UPDATE, oc.AUD_REQ]
 
     def __init__(self, role, ca):
         self._role = role
+        self._ID = None
+        self._kpriv = None
+        self._kpub = None
+        self._identity = False
+        self._cc = None
         self._ca = ca
-        self._obtainIdentity(ca)
+        self._obtainIdentity()
+        self._cntout = dict()
+        self._cntin = dict()
+
+
+    def _notifyMessage(self, receiver, code):
+        pass
 
 
     # inizializzazione identità presso una CA
-    def _obtainIdentity(self, ca):
+    def _obtainIdentity(self):
         if not self._identity:
             self._kpriv, self._kpub = PiAsim.GenAsim(2048)
-            self._ID = ca.subscribe(self, self._role, self._kpub)
+            self._ID = self._ca.subscribe(self, self._role, self._kpub)
             self._identity = True
             return
         print("Identità già inizializzata")
@@ -105,7 +103,7 @@ class Comunication:
         c = [kc , csign]
 
         # passo 9
-        self._cc.get(dest).receive(c)
+        self._cc.send(dest, c)
         return
 
     def receive(self, c):
@@ -130,12 +128,12 @@ class Comunication:
             sign,cnt,m = msign
             signaudit = None
 
-        ID = m[0]
-        if ID not in self._cntin:
-            self._cntin[ID] = 0
+        IDsender = m[0]
+        if IDsender not in self._cntin:
+            self._cntin[IDsender] = 0
 
         # passo 5
-        kpub = self._ca.getPublic(ID)
+        kpub = self._ca.getPublic(IDsender)
 
         # passo 5.5
         if signaudit is not None:
@@ -143,23 +141,24 @@ class Comunication:
             saudit = Serializer.serialize(audit)
             if not S.Vrfy(kpub, saudit, signaudit):
                 raise ValueError("Errore nella firma dell'audit")
-            print("Firma Audit verificata")
+            print(self._ID + ": Firma Audit verificata")
 
         # passo 6
-        if not cnt > self._getcntin(ID):
+        if not cnt > self._getcntin(IDsender):
             raise ValueError("Attacco Replay")
 
         # passo 7
         if not S.Vrfy(kpub, Serializer.serialize([cnt , m]), sign):
-            raise ValueError("Messaggio non valido")
+            self._notifyMessage(IDsender ,nc.INVALID)
+            return None
 
-        self._cntupdatein(ID, cnt)
-        print("messaggio autenticato e validato")
+        self._cntupdatein(IDsender, cnt)
+        print(self._ID + ": messaggio autenticato e validato")
 
         if flag:
-            return m , op , kpub , cnt, signaudit
+            return [m , IDsender, op , kpub , cnt, signaudit]
 
-        return m , op, kpub
+        return [m , op, kpub]
 
 
 class User(Comunication):
@@ -168,3 +167,19 @@ class User(Comunication):
         k1c = PiAsim.EncAsim(k,k1)
         k2c = PiAsim.EncAsim(k,k2)
         return k1c,k2c
+
+    def receive(self, c):
+        m , op, kpub = super().receive(c)
+        if op == oc.NOTIFY:
+            self._notify(m)
+
+    def _notify(self,message):
+        code = message[2]
+        if code == nc.SUCCESS:
+            print(self._ID + ": Operazione svolta con successo!!")
+        elif code == nc.INVALID:
+            print(self._ID + ": Operazione non effettuata: Dati non validi")
+        elif code == nc.UNAUTH:
+            print(self._ID + ": Operazione non effettuata: Autorizzazione negata")
+        elif code == nc.INEX:
+            print(self._ID + ": Operazione non effettuata: identificativo inesistente")

@@ -10,3 +10,6 @@ class ComunicationChannel:
         if ID in self._channel:
             return self._channel[ID]
         raise ValueError("L'ID non è presente nel sistema")
+
+    def send(self,ID,message):
+        self._channel[ID].receive(message)
