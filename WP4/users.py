@@ -47,7 +47,7 @@ class Clinica(User):
         message = [self._ID, "00", IDpaziente, IDreferto, DdR]
 
         IDrm
-        
+
         self.send(IDrm, message)
 
 
