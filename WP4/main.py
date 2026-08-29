@@ -17,6 +17,5 @@ l = r.deserialize(d)
 
 ca = CA()
 rm = RM(Role.RM , ca)
-m = ("RM0", "00" , 21, 12, 4, 4)
+m = ("RM0", "00" , 21, 12, [0,0,0,0])
 rm.send(rm._ID, m , [m[0], m[1]])
-print(rm._lastMessage)

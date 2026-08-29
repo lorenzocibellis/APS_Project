@@ -110,6 +110,8 @@ class Comunication:
         return
 
     def receive(self, c):
+        flag = False
+
         # passo 1
         kc, csign = c
 
@@ -123,6 +125,7 @@ class Comunication:
         #passo 4
         op = msign[-1][1]
         if op in self._auditOp:
+            flag = True
             signaudit, sign , cnt , m = msign
         else:
             sign,cnt,m = msign
@@ -138,8 +141,8 @@ class Comunication:
         # passo 5.5
         if signaudit is not None:
             audit = [m[0] , m[1] , cnt]
-            audit = Serializer.serialize(audit)
-            if not S.Vrfy(kpub, audit, signaudit):
+            saudit = Serializer.serialize(audit)
+            if not S.Vrfy(kpub, saudit, signaudit):
                 raise ValueError("Errore nella firma dell'audit")
             print("Firma Audit verificata")
 
@@ -152,9 +155,11 @@ class Comunication:
             raise ValueError("Messaggio non valido")
 
         self._cntupdatein(ID, cnt)
-        print("messaggio autenticato")
+        print("messaggio autenticato e validato")
 
-        self._lastMessage = m
-        return
+        if flag:
+            return m , op , audit , signaudit
+
+        return m , op
 
 
