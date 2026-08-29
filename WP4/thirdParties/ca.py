@@ -1,29 +1,27 @@
 from users import Role
-
+from thirdParties.comunicationChannel import ComunicationChannel
 #Certificate Authority
 class CA:
 
     #inizializzazione del database degli utenti
-    def __initialite__(self, rm):
+    def __init__(self):
         self.pdict = dict()
         self.cdict = dict()
         self.mdict = dict()
+        self._cc = ComunicationChannel()
+        self._rm = None
 
 
 
-    def subscribeRM(self, rm, kpub):
-        if kpub == None:
-            raise ValueError
-        id = "RM0"
-        self.rm = (id , rm._role , rm._kpub)
-        return id
-
-    def subscribeUser(self, user, role, kpub):
+    def subscribe(self, actor, role, kpub):
         #Controllo sulla chiave pubblica dell'utente
         if kpub == None:
             raise ValueError
 
-        if role == Role.CLINICA:
+        if role == Role.RM:
+            ID = "RM0"
+            self._rm = (ID, actor._role, actor._kpub)
+        elif role == Role.CLINICA:
             ID = "C" + len(self.cdict)
             self.cdict[ID] = (kpub, role)
         elif role == Role.PAZIENTE:
@@ -34,12 +32,14 @@ class CA:
             self.mdict[ID] = (kpub, role)
         else:
             raise ValueError
+        self._cc._add(ID, actor)
+        actor._cc = self._cc
         return ID
 
     def getPublic(self, ID):
         r = ID[0]
-        if ID == self.rm[0]:
-            return [1]
+        if ID == self._rm[0]:
+            return self._rm[2]
         elif r == "C":
             return self.cdict[ID][0]
         elif r == "P":
@@ -61,3 +61,4 @@ class CA:
             return self.mdict[ID][1]
         else:
             raise ValueError
+

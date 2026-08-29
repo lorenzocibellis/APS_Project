@@ -1,5 +1,8 @@
 import pickle
 
+from cryptoOperation.serializer import Serializer
+
+
 class Audit:
     def __init__(self, IDrichiedente, operation, cnt, signaudit):
         self.IDrichiedente = IDrichiedente
@@ -8,7 +11,7 @@ class Audit:
         self.signaudit = signaudit
 
     def serialize(self):
-        return pickle.dumps(self)
+        return Serializer.serialize(self)
 
     def deserialize(serializedAudit):
-        return pickle.loads(serializedAudit)
+        return Serializer.deserialize(serializedAudit)

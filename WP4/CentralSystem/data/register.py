@@ -1,7 +1,5 @@
 from cryptoOperation.cryptOp import H
-
-#implementazione serializzazione e deserializzazione
-import pickle
+from cryptoOperation.serializer import Serializer
 
 class Register:
     def __init__(self, genesis=b"0000"):
@@ -18,11 +16,11 @@ class Register:
             self._register.append((a, H.Hash(a.serialize() + b"|" + self._register[l - 1][1])))
 
     def serialize(self):
-        return pickle.dumps(self)
+        return Serializer.serialize(self)
 
     @staticmethod
     def deserialize(serializedRegister):
-        return pickle.loads(serializedRegister)
+        return Serializer.deserialize(serializedRegister)
 
 
 
