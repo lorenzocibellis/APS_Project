@@ -70,6 +70,11 @@ class Database:
             return False
         return self._database[IDpaziente][IDreferto].isRevoked()
 
+    def exists(self,IDpaziente,IDreferto):
+        if IDpaziente not in self._database:
+            return False
+        return IDreferto in self._database[IDpaziente]
+
     def __contains__(self, item):
         p , r = item.getIDpaziente() , item.getIDreferto()
         if p not in self._database:

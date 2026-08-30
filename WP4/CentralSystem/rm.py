@@ -1,6 +1,7 @@
 from datetime import timezone, datetime, timedelta
 
 from cryptoOperation.cryptOp import S
+from cryptoOperation.serializer import Serializer
 from interfaces import Comunication
 from CentralSystem.data.database import Database
 from globalClasses.enumerations import OperationCode as oc, NotifyCode as nc, Role
@@ -23,8 +24,10 @@ class RM(Comunication):
         print("Elaborazione della richiesta")
         if op == oc.STORE:
             #controllo sincronizzazione dati tra mittente e messaggio
-            if self._ca.getRole(sender) is not Role.CLINICA or sender != m[0]:
-                self._notifyMessage(sender, "01")
+            if self._ca.getRole(sender) != Role.CLINICA or sender != m[0]:
+                self._notifyMessage(sender, nc.INVALID_DATA)
+                return
+
             self._store(m, cnt, signaudit)
 
         elif op == oc.REF_REQ:
@@ -37,7 +40,7 @@ class RM(Comunication):
             self._revoke(m, cnt, signaudit)
 
         elif op == oc.UPDATE:
-            self._revoke(m, cnt, signaudit)
+            self._update(m, cnt, signaudit)
 
         elif op == oc.AUD_REQ:
             self._getAuditing(m, cnt, signaudit)
@@ -61,6 +64,7 @@ class RM(Comunication):
             self._db.addAudit(IDpaziente, IDreferto, IDclinica, oc.STORE, cnt, signaudit)
         self._notifyMessage(IDclinica ,error)
 
+
     def _getRef(self, m, cnt, signaudit):
         if len(m) != 5:
             self._notifyMessage(m[0], nc.INVALID_DATA)
@@ -68,39 +72,48 @@ class RM(Comunication):
         print("RM: Elaborazione Caricamento Referto")
         print(m)
         IDrichiedente, _, IDpaziente, IDreferto, Auth = m
+
+        #Controllo che il referto esista in memoria
+        if not self._db.exists(IDpaziente,IDreferto):
+            self._notifyMessage(IDrichiedente, nc.INEX)
+            return
+
         role = self._ca.getRole(IDrichiedente)
 
+        IDclinica = self._db.getIDclinica(IDpaziente, IDreferto)
         #CASO SPECIALE: autorizzazione per il medico
-        if role is Role.MEDICO:
+        if role == Role.MEDICO:
             print("RM: Controllo autorizzazione per medico " + IDrichiedente)
             sign, IDmedico, IDpazienteAuth, IDrefertoAuth, TimeStamp = Auth
 
             #controllo sincronizzazione dati
             if IDmedico != IDrichiedente or IDpazienteAuth != IDpaziente or IDrefertoAuth != IDreferto:
-                self._notifyMessage(IDrichiedente, "01")
+                self._notifyMessage(IDrichiedente, nc.INVALID_DATA)
                 return
 
             #controllo scadenza autorizzazione
             if not isinstance(TimeStamp, datetime):
-                self._notifyMessage(IDrichiedente, "01")
+                self._notifyMessage(IDrichiedente, nc.INVALID_DATA)
                 return
             if  TimeStamp + timedelta(days = self._daysToExpire) < datetime.now(timezone.utc):
-                self._notifyMessage(IDrichiedente, "02")
+                self._notifyMessage(IDrichiedente, nc.UNAUTH)
                 return
 
             # controllo autorizzazione
             kpub = self._ca.getPublic(IDpaziente)
-            if not S.Vrfy(kpub, Auth[1:], sign):
-                self._notifyMessage(IDrichiedente, "02")
+            if not S.Vrfy(kpub, Serializer.serialize(Auth[1:]), sign):
+                self._notifyMessage(IDrichiedente, nc.UNAUTH)
                 return
 
             print("RM: Autorizzazione consentita a :" + IDrichiedente)
-            #Dummy bits per il medico
 
         # Si controlla che chi ha richiesto i documenti sia autorizzato ad ottenerli
-        elif IDrichiedente != IDpaziente or IDrichiedente != self._db.getIDclinica(IDpaziente, IDreferto):
-                self._notifyMessage(IDrichiedente, "02")
+        elif IDrichiedente != IDpaziente and IDrichiedente != IDclinica:
+                self._notifyMessage(IDrichiedente, nc.UNAUTH)
                 return
+
+        #si aggiunge l'evento al registro audit
+        self._db.addAudit(IDpaziente, IDreferto, IDclinica, oc.REF_REQ, cnt, signaudit)
 
         self._sendReferto(IDpaziente, IDreferto, IDrichiedente)
         return
@@ -109,7 +122,7 @@ class RM(Comunication):
     def _sendReferto(self, IDpaziente, IDreferto, receiver):
         item = self._db.getItem(IDpaziente, IDreferto)
         print("RM: Preparazione messaggio di invio del referto")
-        op = "02"
+        op = oc.REF_SEND
         sender = self._ID
         IDclinica = item.getIDclinica()
         IDpaziente = item.getIDpaziente()
@@ -122,6 +135,7 @@ class RM(Comunication):
             ksim,krev = item.getKeyClinica()
         else:
             #il receiver è un dottore
+            #Dummy bits per il medico
             ksim, krev = None , None
 
         trev = item.getTokenRev()
@@ -137,14 +151,6 @@ class RM(Comunication):
         print("RM: Messaggio creato")
         self.send(receiver, message)
         return
-
-
-
-
-
-
-
-
 
     def _notifyMessage(self, receiver, code):
         message = [self._ID, oc.NOTIFY, code]

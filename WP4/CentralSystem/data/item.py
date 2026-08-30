@@ -4,7 +4,7 @@ class Item:
     def __init__(self, IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica, trev, crevoca, creferto):
         self._IDpaziente = IDpaziente
         self._IDreferto = IDreferto
-        self._clinica = IDclinica
+        self._IDclinica = IDclinica
         self._ksimpaziente = ksimpaziente
         self._ksimclinica = ksimclinica
         self._krevpaziente = krevpaziente
@@ -48,7 +48,7 @@ class Item:
         return self._IDreferto
 
     def getTokenRev(self):
-        self._trev
+        return self._trev
 
 
     def getMdr(self):
@@ -69,7 +69,7 @@ class Item:
         return (
             f"=== Item Referto [{self._IDreferto}] ===\n"
             f"  • Paziente ID:       {self._IDpaziente}\n"
-            f"  • Clinica ID:        {self._clinica}\n"
+            f"  • Clinica ID:        {self._IDclinica}\n"
             f"  • Stato:             {stato_revoca}\n"
             f"  • Token validazione Revoca:  {self._trev}\n"
             f"  • KSim Paziente:     {self._ksimpaziente}\n"

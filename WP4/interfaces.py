@@ -172,6 +172,8 @@ class User(Comunication):
         m , op, kpub = super().receive(c)
         if op == oc.NOTIFY:
             self._notify(m)
+        if op == oc.REF_SEND:
+            print(self._ID + ": Ottenuti i documenti!!")
 
     def _notify(self,message):
         code = message[2]

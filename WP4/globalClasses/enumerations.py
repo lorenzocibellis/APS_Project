@@ -11,7 +11,7 @@ class Role(StrEnum):
 class OperationCode(StrEnum):
     STORE = "00"
     REF_REQ = "01"
-    SEND = "02"
+    REF_SEND = "02"
     VIS_REQ = "03"
     CONFIRM = "04"
     KEY_REQ = "05"
