@@ -44,8 +44,24 @@ class Database:
     def getItem(self, IDpaziente, IDreferto):
         return self._database[IDpaziente][IDreferto]
 
+    def getRevoca(self, IDpaziente, IDreferto):
+        return self.getItem(IDpaziente,IDreferto).getMdr()
+
+    def getReferto(self, IDpaziente, IDreferto):
+        return self.getItem(IDpaziente,IDreferto).getReferto()
+
+    def getKeyClinica(self, IDpaziente, IDreferto):
+        return self.getItem(IDpaziente, IDreferto).getKeyClinica()
+
+    def getKeyPaziente(self, IDpaziente,IDreferto):
+        return self.getItem(IDpaziente, IDreferto).getKeyPaziente()
+
+    def getIDclinica(self, IDpaziente,IDreferto):
+        return self.getItem(IDpaziente, IDreferto).getIDclinica()
+
     def getRM(self):
         return self.rm
+
 
     def isRevoked(self, IDpaziente, IDreferto):
         if IDpaziente not in self._database:

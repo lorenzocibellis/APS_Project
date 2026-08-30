@@ -149,7 +149,7 @@ class Comunication:
 
         # passo 7
         if not S.Vrfy(kpub, Serializer.serialize([cnt , m]), sign):
-            self._notifyMessage(IDsender ,nc.INVALID)
+            self._notifyMessage(IDsender, nc.INVALID_DATA)
             return None
 
         self._cntupdatein(IDsender, cnt)
@@ -177,7 +177,7 @@ class User(Comunication):
         code = message[2]
         if code == nc.SUCCESS:
             print(self._ID + ": Operazione svolta con successo!!")
-        elif code == nc.INVALID:
+        elif code == nc.INVALID_DATA:
             print(self._ID + ": Operazione non effettuata: Dati non validi")
         elif code == nc.UNAUTH:
             print(self._ID + ": Operazione non effettuata: Autorizzazione negata")

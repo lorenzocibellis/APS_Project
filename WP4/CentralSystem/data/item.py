@@ -32,6 +32,9 @@ class Item:
         self._creferto = creferto
         return
 
+    def addAudit(self, audit):
+        self._register.addAudit(audit)
+
     def isRevoked(self):
         return self._flagRevoca
 
@@ -44,8 +47,21 @@ class Item:
     def getIDreferto(self):
         return self._IDreferto
 
-    def addAudit(self,audit):
-        self._register.addAudit(audit)
+    def getTokenRev(self):
+        self._trev
+
+
+    def getMdr(self):
+        return self._crevoca
+
+    def getReferto(self):
+        return self._creferto
+
+    def getKeyClinica(self):
+        return self._ksimclinica, self._krevclinica
+
+    def getKeyPaziente(self):
+        return self._ksimpaziente, self._krevpaziente
 
     def __str__(self):
         stato_revoca = "REVOCATO" if self._flagRevoca else "ATTIVO"

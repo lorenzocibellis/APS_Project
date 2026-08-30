@@ -43,7 +43,14 @@ class Clinica(User):
         IDrm = self._ca.getRMID()
         self.send(IDrm, message)
 
+    def send(self, dest, m):
+        print(self._ID + ": Invio Messaggio")
+        super().send(dest, m)
 
+    def receive(self, c):
+        print(self._ID + ": Messaggio ottenuto")
+        super().receive(c)
+        
 
 #class Paziente(Comunication):
 

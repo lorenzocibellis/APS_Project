@@ -24,6 +24,7 @@ class OperationCode(StrEnum):
 
 class NotifyCode(StrEnum):
     SUCCESS = "00"
-    INVALID = "01"
+    INVALID_DATA = "01"
     UNAUTH = "02"
     INEX = "03"
+    INVALID_OP = "04"
