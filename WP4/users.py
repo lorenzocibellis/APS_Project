@@ -9,8 +9,7 @@ from globalClasses.enumerations import OperationCode as oc, Role
 class Clinica(User):
 
     def __init__(self,ca, rm):
-        super().__init__(Role.CLINICA,ca)
-        self._rm = rm
+        super().__init__(Role.CLINICA,ca, rm)
 
 
     def createRefertoCifrato(self,IDpaziente, IDreferto ,referto):
@@ -32,13 +31,13 @@ class Clinica(User):
         CdR = str(a) + str(b) + str(c)
 
         #concatenazione
-        base = [IDreferto , Cdr, False]
+        base = [IDreferto , CdR, False]
         sbase = Serializer.serialize(base)
-        trev = S.Sign(self._kpriv, base)
+        trev = S.Sign(self._kpriv, sbase)
 
-        DdR = [ksimclinica, ksimpaziente, trev, creferto]
+        DdR = [ksimclinica, ksimpaziente, trev, CdR, creferto]
 
-        message = [self._ID, "00", IDpaziente, IDreferto, DdR]
+        message = [self._ID, oc.STORE, IDpaziente, IDreferto, DdR]
 
         IDrm = self._ca.getRMID()
         self.send(IDrm, message)
@@ -52,7 +51,32 @@ class Clinica(User):
         super().receive(c)
         
 
-#class Paziente(Comunication):
+class Paziente(User):
+    def __init__(self, ca, rm):
+        super().__init__(Role.PAZIENTE, ca, rm)
 
 
-#class Medico(Comunication):
+
+class Medico(User):
+
+    def __init__(self, ca, rm):
+        super().__init__(Role.MEDICO, ca, rm)
+        self._ksim = dict()
+        self._krev = dict()
+
+    def _storeAuth(self, Auth, IDpaziente):
+        self._auth[IDpaziente] = Auth
+
+    def _storeKeys(self, krev, ksim, IDpaziente):
+        self._krev[IDpaziente] = krev
+        self._ksim[IDpaziente] = ksim
+
+
+    def _obtainKey(self, IDpaziente, IDclinica, DdRevoca, DdReferto):
+        ksim, krev = super()._obtainKey(IDpaziente, IDclinica, DdRevoca, DdReferto)
+        if ksim is None:
+            ksim = self._ksim[IDpaziente]
+        if krev is None:
+            krev = self._krev[IDpaziente]
+
+        return ksim, krev

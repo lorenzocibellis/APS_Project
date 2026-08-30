@@ -7,8 +7,8 @@ class Database:
     def __init__(self):
         self._database = dict()
 
-    def addItem(self, IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica,trev, crevoca, creferto , verbose = False):
-        item = Item(IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica, trev, crevoca, creferto)
+    def addItem(self, IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica,trev, CdR,crevoca, creferto , verbose = False):
+        item = Item(IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica, trev, CdR ,crevoca, creferto)
         if item in self:
             return "01"
         if IDpaziente not in self._database:
@@ -20,12 +20,12 @@ class Database:
             print("\nAggiunto item:\n" + str(item) +"\n")
         return "00"
 
-    def revokeItem(self, IDpaziente, IDreferto, krevpaziente, krevclinica, trev, crevoca):
+    def revokeItem(self, IDpaziente, IDreferto, krevpaziente, krevclinica, trev, CdR, crevoca):
         if IDpaziente not in self._database:
             return "03"
         if IDreferto not in self._database[IDpaziente]:
             return "03"
-        self._database[IDpaziente][IDreferto].revokeItem(krevpaziente, krevclinica, trev, crevoca)
+        self._database[IDpaziente][IDreferto].revokeItem(krevpaziente, krevclinica, trev, CdR, crevoca)
         return "00"
 
 
@@ -58,9 +58,6 @@ class Database:
 
     def getIDclinica(self, IDpaziente,IDreferto):
         return self.getItem(IDpaziente, IDreferto).getIDclinica()
-
-    def getRM(self):
-        return self.rm
 
 
     def isRevoked(self, IDpaziente, IDreferto):

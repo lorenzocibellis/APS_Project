@@ -20,6 +20,8 @@ class RM(Comunication):
         data = super().receive(c)
         if data is None:
             return
+        if len(data) != 6:
+            return
         m, sender, op, kpub, cnt, signaudit = data
         print("Elaborazione della richiesta")
         if op == oc.STORE:
@@ -58,8 +60,8 @@ class RM(Comunication):
            return
         print(m)
         IDclinica, _ , IDpaziente , IDreferto, DdR = m
-        ksimc, ksimp , trev, creferto = DdR
-        error = self._db.addItem(IDpaziente, IDreferto, IDclinica, ksimp, ksimc, None, None, trev, None, creferto)
+        ksimc, ksimp , trev, CdR ,creferto = DdR
+        error = self._db.addItem(IDpaziente, IDreferto, IDclinica, ksimp, ksimc, None, None, trev, CdR,None, creferto)
         if error == nc.SUCCESS:
             self._db.addAudit(IDpaziente, IDreferto, IDclinica, oc.STORE, cnt, signaudit)
         self._notifyMessage(IDclinica ,error)
@@ -84,6 +86,9 @@ class RM(Comunication):
         #CASO SPECIALE: autorizzazione per il medico
         if role == Role.MEDICO:
             print("RM: Controllo autorizzazione per medico " + IDrichiedente)
+            if len(Auth) != 5:
+                self._notifyMessage(IDrichiedente, nc.INVALID_DATA)
+                return
             sign, IDmedico, IDpazienteAuth, IDrefertoAuth, TimeStamp = Auth
 
             #controllo sincronizzazione dati
@@ -127,7 +132,7 @@ class RM(Comunication):
         IDclinica = item.getIDclinica()
         IDpaziente = item.getIDpaziente()
         flag = item.isRevoked()
-
+        CdR = item.getCdR()
         #decisione sulle chiavi
         if receiver == IDpaziente:
             ksim, krev = item.getKeyPaziente()
@@ -140,13 +145,13 @@ class RM(Comunication):
 
         trev = item.getTokenRev()
         crevoca = item.getMdr()
-        DdRevoca = [krev, trev, crevoca]
+        DdRevoca = [krev, trev, CdR, crevoca]
 
         creferto = item.getReferto()
         DdReferto = [ksim, creferto]
 
         #combinazione dati nel messaggio
-        message = [sender, receiver, op, IDclinica, IDpaziente, flag, DdRevoca, DdReferto]
+        message = [sender,  op, IDclinica, IDpaziente, IDreferto, flag, DdRevoca, DdReferto]
 
         print("RM: Messaggio creato")
         self.send(receiver, message)

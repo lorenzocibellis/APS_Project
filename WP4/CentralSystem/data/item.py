@@ -1,7 +1,7 @@
 from CentralSystem.data.register import Register
 
 class Item:
-    def __init__(self, IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica, trev, crevoca, creferto):
+    def __init__(self, IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica, trev, CdR,crevoca, creferto):
         self._IDpaziente = IDpaziente
         self._IDreferto = IDreferto
         self._IDclinica = IDclinica
@@ -11,16 +11,18 @@ class Item:
         self._krevclinica = krevclinica
         self._flagRevoca = False
         self._trev = trev
+        self._CdR = CdR
         self._crevoca = crevoca
         self._creferto = creferto
         self._register = Register()
         return
 
-    def revokeItem(self, krevpaziente, krevclinica, trev, crevoca):
+    def revokeItem(self, krevpaziente, krevclinica, trev, CdR, crevoca):
         self._krevpaziente = krevpaziente
         self._krevclinica = krevclinica
         self._flagRevoca = True
         self._trev = trev
+        self._CdR = CdR
         self._crevoca = crevoca
         return
 
@@ -37,6 +39,9 @@ class Item:
 
     def isRevoked(self):
         return self._flagRevoca
+
+    def getCdR(self):
+        return self._CdR
 
     def getIDpaziente(self):
         return self._IDpaziente
