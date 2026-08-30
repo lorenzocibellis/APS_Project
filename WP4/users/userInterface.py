@@ -30,7 +30,7 @@ class User(Comunication):
         m , op, kpub = data
 
         if op == oc.NOTIFY:
-            self._notify(m[1])
+            self._notify(m[2])
         if op == oc.REF_SEND:
             self._obtainDocuments(m)
 
@@ -54,12 +54,14 @@ class User(Comunication):
         IDsender, _, IDclinica, IDpaziente, IDreferto, FdR, DdRevoca, DdReferto = message
         kpub = self._ca.getPublic(IDclinica)
 
-        #ottenimento chiavi simmetriche
-        ksim, krev = self._obtainKey(IDpaziente, IDclinica, DdRevoca, DdReferto)
-
         if len(DdRevoca) != 4 or len(DdReferto) != 2:
             self._notify(nc.INVALID_DATA)
             return
+
+        #ottenimento chiavi simmetriche
+        ksim, krev = self._obtainKey(IDpaziente, IDclinica, DdRevoca, DdReferto)
+
+
 
         #Ottenimento documenti cifrati
         _, trev, CdR, crevoca = DdRevoca
@@ -86,15 +88,17 @@ class User(Comunication):
             if not S.Vrfy(kpub, Serializer.serialize(MdR), signrevoca):
                 self._notify(nc.INVALID_DATA)
                 return
-            else:
-                MdR = None
+        else:
+            MdR = None
 
         #verifica del referto
         if not S.Vrfy(kpub, Serializer.serialize(referto), signreferto):
+            self._notify(nc.INVALID_DATA)
+            return
 
         print("Documenti ottenuti validi!")
         self._printDocuments(referto, FdR, MdR)
-        return
+
 
 
     def _printDocuments(self, ref, f, rev):
