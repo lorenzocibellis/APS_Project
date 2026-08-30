@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     print("=== TEST 1: MEMORIZZAZIONE REFERTO ===")
     # La clinica cifra il referto ed invia l'operazione oc.STORE al RM
-    clinica.createRefertoCifrato(id_paziente, id_referto, contenuto_referto)
+    clinica.createAndSendReferto(id_paziente, id_referto, contenuto_referto)
 
     print("\n=== TEST 2: RICHIESTA REFERTO ===")
     # La clinica prepara e invia il messaggio di richiesta oc.REF_REQ al RM
