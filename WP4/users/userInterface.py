@@ -67,26 +67,30 @@ class User(Comunication):
 
         #Fine ottenimento dati di Pre-Condizione
 
-        #Estrazione documento
-        mreferto = PiSim.DecSim(ksim, creferto)
-        mreferto = Serializer.deserialize(mreferto)
-        signreferto, referto = mreferto
-
-        mrevoca = PiSim.DecSim(krev, crevoca)
-        mrevoca = Serializer.deserialize(mrevoca)
-        signrevoca, MdR = mrevoca
-
-        #validazione metadati di revoca
+        # validazione metadati di revoca
         base = [IDreferto, CdR, FdR]
         sbase = Serializer.serialize(base)
         if not S.Vrfy(kpub, sbase, trev):
             self._notify(nc.INVALID_DATA)
             return
 
-        #verifica dei documenti
-        if not S.Vrfy(kpub, Serializer.serialize(referto), signreferto) or not S.Vrfy(kpub, Serializer.serialize(MdR), signrevoca):
-            self._notify(nc.INVALID_DATA)
-            return
+        #Estrazione documento
+        mreferto = PiSim.DecSim(ksim, creferto)
+        mreferto = Serializer.deserialize(mreferto)
+        signreferto, referto = mreferto
+        if FdR:
+            mrevoca = PiSim.DecSim(krev, crevoca)
+            mrevoca = Serializer.deserialize(mrevoca)
+            signrevoca, MdR = mrevoca
+            #verifica revoca
+            if not S.Vrfy(kpub, Serializer.serialize(MdR), signrevoca):
+                self._notify(nc.INVALID_DATA)
+                return
+            else:
+                MdR = None
+
+        #verifica del referto
+        if not S.Vrfy(kpub, Serializer.serialize(referto), signreferto):
 
         print("Documenti ottenuti validi!")
         self._printDocuments(referto, FdR, MdR)

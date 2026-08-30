@@ -1,4 +1,5 @@
 from globalClasses.enumerations import Role
+from users.userInterface import User
 
 
 class Medico(User):
@@ -7,6 +8,7 @@ class Medico(User):
         super().__init__(Role.MEDICO, ca, rm)
         self._ksim = dict()
         self._krev = dict()
+        self._auth = dict()
 
     def _storeAuth(self, Auth, IDpaziente):
         self._auth[IDpaziente] = Auth
