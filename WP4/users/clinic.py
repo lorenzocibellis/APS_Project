@@ -1,5 +1,10 @@
-from comunicationInterface import User
+import random
 
+from cryptoOperation.cryptOp import PiSim, S
+from cryptoOperation.serializer import Serializer
+from globalClasses.enumerations import Role
+from users.userInterface import User
+from globalClasses.enumerations import OperationCode as oc, NotifyCode as nc
 
 class Clinica(User):
 
@@ -10,7 +15,7 @@ class Clinica(User):
         # generazione chiave simmetrica
         ksim = PiSim.GenSim()
 
-        sign = S.Sign(self._kpriv, referto)
+        sign = S.Sign(self._kpriv, Serializer.serialize(referto))
         refertosign = Serializer.serialize([sign, referto])
         creferto = PiSim.EncSim(ksim, refertosign)
 

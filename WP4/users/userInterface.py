@@ -13,10 +13,10 @@ class User(Comunication):
         super().__init__(role, ca)
         self._rm = rm
 
-    #metodo che permette la cifratura di una chiave usando 2 chiavi diverse tramite cifrtura asimmetrica
+    #metodo che permette la cifratura di una chiave k usando 2 chiavi diverse k1 e k2 tramite cifrtura asimmetrica
     def _doublecrit(self,k, k1, k2):
-        k1c = PiAsim.EncAsim(k,k1)
-        k2c = PiAsim.EncAsim(k,k2)
+        k1c = PiAsim.EncAsim(k1, k)
+        k2c = PiAsim.EncAsim(k2, k)
         return k1c,k2c
 
     def receive(self, c):
@@ -110,7 +110,14 @@ class User(Comunication):
     def _obtainKey(self, IDpaziente, IDclinica, DdRevoca, DdReferto):
         paziente = IDpaziente
         clinica = IDclinica
-        return DdReferto[0], DdRevoca[0]
+        ksim, krev =  DdReferto[0], DdRevoca[0]
+        if ksim is not None:
+            ksim = PiAsim.DecAsim(self._kpriv, ksim)
+        if krev is not None:
+            krev = PiAsim.DecAsim(self._kpriv, krev)
+
+        return ksim, krev
+
 
 
 
