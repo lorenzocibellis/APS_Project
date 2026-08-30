@@ -2,7 +2,7 @@ from datetime import timezone, datetime, timedelta
 
 from cryptoOperation.cryptOp import S
 from cryptoOperation.serializer import Serializer
-from interfaces import Comunication
+from comunicationInterface import Comunication
 from CentralSystem.data.database import Database
 from globalClasses.enumerations import OperationCode as oc, NotifyCode as nc, Role
 
