@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     print("\n=== TEST 2: RICHIESTA REFERTO ===")
     # La clinica prepara e invia il messaggio di richiesta oc.REF_REQ al RM
-    messaggio_richiesta = [clinica._ID, oc.REF_REQ, id_paziente, id_referto, None]
+    messaggio_richiesta = [clinica._ID, oc.REF_REQ, id_paziente, "C0_"+id_referto, None]
     id_rm = ca.getRMID()
 
     clinica.send(id_rm, messaggio_richiesta)

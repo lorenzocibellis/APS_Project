@@ -39,7 +39,7 @@ class Clinica(User):
         #(ID considerato locale) lo trasforma in ID globale
         if not IDreferto.startswith(self._ID + "_"):
             IDreferto = self._ID + "_" + IDreferto
-            
+
         if IDpaziente not in self._database or IDreferto not in self._database[IDpaziente]:
             print("Referto non esistente")
             return
