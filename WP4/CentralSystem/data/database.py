@@ -59,6 +59,8 @@ class Database:
     def getIDclinica(self, IDpaziente,IDreferto):
         return self.getItem(IDpaziente, IDreferto).getIDclinica()
 
+    def getCdR(self, IDpaziente, IDreferto):
+        return self.getItem(IDpaziente, IDreferto).getCdR()
 
     def isRevoked(self, IDpaziente, IDreferto):
         if IDpaziente not in self._database:

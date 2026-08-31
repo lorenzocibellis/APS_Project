@@ -55,6 +55,8 @@ class Item:
     def getTokenRev(self):
         return self._trev
 
+    def getCdR(self):
+        return self._CdR
 
     def getMdr(self):
         return self._crevoca
@@ -83,6 +85,7 @@ class Item:
             f"  • KRev Clinica:      {self._krevclinica}\n"
             f"  • Cifrato Referto:   {self._creferto}\n"
             f"  • Cifrato Revoca:    {self._crevoca}\n"
+            f"  • Codice della Revoca:    {self._CdR}\n"
             f"  • Registro Audit:    {self._register}\n"
             f"================================="
         )

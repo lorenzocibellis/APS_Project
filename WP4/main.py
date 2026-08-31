@@ -32,7 +32,6 @@ while 1:
         print("Messaggio non inviato")
         
         """
-
 from CentralSystem.data.database import Database
 from CentralSystem.rm import RM
 from thirdParties.ca import CA
@@ -41,29 +40,37 @@ from users.patient import Paziente
 from globalClasses.enumerations import Role, OperationCode as oc
 
 if __name__ == "__main__":
-    # 1. Inizializzazione della Certificate Authority e del Database
+    # 1. Inizializzazione CA, Database e Resource Manager (RM)
     ca = CA()
     db = Database()
-
-    # 2. Creazione del Resource Manager (RM)
-    # Registrazione automatica presso la CA e collegamento al ComunicationChannel
     rm = RM(Role.RM, ca, db)
 
-    # 3. Creazione e iscrizione del Paziente e della Clinica
+    # 2. Inizializzazione degli attori
     paziente = Paziente(ca, rm)
     clinica = Clinica(ca, rm)
 
     id_paziente = paziente._ID
-    id_referto = "REF_2026_001"
-    contenuto_referto = "Referto medico 2026: Tutti i parametri sono nella norma."
-
-    print("=== TEST 1: MEMORIZZAZIONE REFERTO ===")
-    # La clinica cifra il referto ed invia l'operazione oc.STORE al RM
-    clinica.createAndSendReferto(id_paziente, id_referto, contenuto_referto)
-
-    print("\n=== TEST 2: RICHIESTA REFERTO ===")
-    # La clinica prepara e invia il messaggio di richiesta oc.REF_REQ al RM
-    messaggio_richiesta = [clinica._ID, oc.REF_REQ, id_paziente, "C0_"+id_referto, None]
+    id_referto_locale = "REF_2026_001"
+    id_referto_univoco = f"{clinica._ID}_{id_referto_locale}"
     id_rm = ca.getRMID()
 
-    clinica.send(id_rm, messaggio_richiesta)
+    print("=== TEST 1: CARICAMENTO REFERTO (STORE) ===")
+    referto_iniziale = "Referto Iniziale: Valori ematici nella norma."
+    clinica.createAndSendReferto(id_paziente, id_referto_locale, referto_iniziale)
+
+    print("\n=== TEST 2: RICHIESTA REFERTO INIZIALE (REF_REQ) ===")
+    richiesta_referto = [clinica._ID, oc.REF_REQ, id_paziente, id_referto_univoco, None]
+    clinica.send(id_rm, richiesta_referto)
+
+    print("\n=== TEST 3: REVOCA REFERTO (REVOKE) ===")
+    motivo_revoca = "Errata trascrizione dell'esame del sangue."
+    clinica.revokeReferto(id_paziente, id_referto_univoco, motivo_revoca)
+
+    print("\n=== TEST 4: AGGIORNAMENTO REFERTO (UPDATE) ===")
+    referto_aggiornato = "Referto Rettificato: Parametri corretti e confermati."
+    # Invia l'aggiornamento al RM
+    clinica.updateReferto(id_paziente, id_referto_univoco, referto_aggiornato)
+
+    print("\n=== TEST 5: VERIFICA DOPO AGGIORNAMENTO (REF_REQ) ===")
+    # Richiesta del referto aggiornato per verificare il reset della flag di revoca a False
+    clinica.send(id_rm, richiesta_referto)

@@ -1,4 +1,5 @@
 from datetime import timezone, datetime, timedelta
+from io import UnsupportedOperation
 
 from cryptoOperation.cryptOp import S
 from cryptoOperation.serializer import Serializer
@@ -61,6 +62,14 @@ class RM(Comunication):
         print(m)
         IDclinica, _ , IDpaziente , IDreferto, DdR = m
         ksimc, ksimp , trev, CdR ,creferto = DdR
+
+        #controllo trev
+        kpub = self._ca.getPublic(IDclinica)
+        base = [IDreferto, CdR, False]
+        if not S.Vrfy(kpub, Serializer.serialize(base), trev):
+            self._notifyMessage(m[0], nc.INVALID_DATA)
+            return
+
         error = self._db.addItem(IDpaziente, IDreferto, IDclinica, ksimp, ksimc, None, None, trev, CdR,None, creferto)
         if error == nc.SUCCESS:
             self._db.addAudit(IDpaziente, IDreferto, IDclinica, oc.STORE, cnt, signaudit)
@@ -156,6 +165,71 @@ class RM(Comunication):
         print("RM: Messaggio creato")
         self.send(receiver, message)
         return
+
+
+    def _revoke(self, m, cnt, signaudit):
+        if len(m) != 5:
+            self._notifyMessage(m[0], nc.INVALID_DATA)
+            return
+
+        IDrichiedente, _, IDpaziente, IDreferto, DdR = m
+
+        if len(DdR) != 5:
+            self._notifyMessage(m[0], nc.INVALID_DATA)
+            return
+
+        krevc, krevp, trev, CdR, crev = DdR
+
+        #Controllo che la clinica della revoca è la stessa che ha creato il referto
+        if not self._db.getIDclinica(IDpaziente,IDreferto) == IDrichiedente:
+            self._notifyMessage(IDrichiedente, nc.UNAUTH)
+            return
+
+        #controllo trev
+        kpub = self._ca.getPublic(IDrichiedente)
+        base = [IDreferto, CdR, True]
+        if not S.Vrfy(kpub, Serializer.serialize(base), trev):
+            self._notifyMessage(m[0], nc.INVALID_DATA)
+            return
+
+
+        error = self._db.revokeItem(IDpaziente, IDreferto, krevp, krevc, trev, CdR, crev)
+        if error == nc.SUCCESS:
+            self._db.addAudit(IDpaziente, IDreferto, IDrichiedente, oc.REVOKE, cnt, signaudit)
+        self._notifyMessage(IDrichiedente ,error)
+
+
+    def _update(self, m, cnt, signaudit):
+        if len(m) != 5:
+            self._notifyMessage(m[0], nc.INVALID_DATA)
+            return
+
+        IDrichiedente, _, IDpaziente, IDreferto, DdR = m
+
+        if len(DdR) != 4:
+            self._notifyMessage(m[0], nc.INVALID_DATA)
+            return
+
+        ksimc, ksimp, trev, cref = DdR
+
+        #Controllo che la clinica dell'aggiornamento è la stessa che ha creato il referto
+        if not self._db.getIDclinica(IDpaziente,IDreferto) == IDrichiedente:
+            self._notifyMessage(IDrichiedente, nc.UNAUTH)
+            return
+
+        #controllo trev
+        kpub = self._ca.getPublic(IDrichiedente)
+        base = [IDreferto, self._db.getCdR(IDpaziente,IDreferto), False]
+        if not S.Vrfy(kpub, Serializer.serialize(base), trev):
+            self._notifyMessage(m[0], nc.INVALID_DATA)
+            return
+
+
+        error = self._db.updateItem(IDpaziente, IDreferto, ksimp, ksimc, trev, cref)
+        if error == nc.SUCCESS:
+            self._db.addAudit(IDpaziente, IDreferto, IDrichiedente, oc.REVOKE, cnt, signaudit)
+        self._notifyMessage(IDrichiedente ,error)
+
 
     def _notifyMessage(self, receiver, code):
         message = [self._ID, oc.NOTIFY, code]

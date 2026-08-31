@@ -30,7 +30,9 @@ class Clinica(User):
             if IDreferto in self._database[IDpaziente]:
                 print("Referto già presente")
                 return
-        self._database[IDpaziente][IDreferto] = [False, None, referto]
+
+        #dato nel database gestito come [ Flag, CdR, MdR, referto ]
+        self._database[IDpaziente][IDreferto] = [False, None, None, referto]
         return IDreferto
 
     def sendReferto(self, IDpaziente, IDreferto):
@@ -44,7 +46,7 @@ class Clinica(User):
             print("Referto non esistente")
             return
 
-        referto = self._database[IDpaziente][IDreferto]
+        referto = self._database[IDpaziente][IDreferto][3]
 
         # generazione chiave simmetrica
         ksim = PiSim.GenSim()
@@ -60,8 +62,8 @@ class Clinica(User):
         ksimpaziente, ksimclinica = self._doublecrit(ksim, kpubpaziente, self._kpub)
 
         # creazione Codice della Revoca casuale
-        a, b, c = random.randint(0, 9), random.randint(0, 9), random.randint(0, 9)
-        CdR = str(a) + str(b) + str(c)
+        CdR = self._obtainCdR()
+        self._database[IDpaziente][IDreferto][1] = CdR
 
         # concatenazione
         base = [IDreferto, CdR, False]
@@ -76,8 +78,82 @@ class Clinica(User):
 
         self.send(IDrm, message)
 
-    def revokeReferto(self, IDreferto):
-        pass
+
+    #Revoca referto
+    def revokeReferto(self, IDpaziente, IDreferto, MdR):
+        if IDpaziente not in self._database:
+            print("Referto non esistente")
+            return
+        if IDreferto not in self._database[IDpaziente]:
+            print("Referto non esistente")
+            return
+
+        list = self._database[IDpaziente][IDreferto]
+        list[0] = True
+        list[2] = MdR
+
+        krev = PiSim.GenSim()
+        sign = S.Sign(self._kpriv, Serializer.serialize(MdR))
+
+        MdRsign = [sign, MdR]
+        crevoca = PiSim.EncSim(krev, Serializer.serialize(MdRsign))
+
+        kpubpaziente = self._ca.getPublic(IDpaziente)
+
+        krevpaziente, krevclinica = self._doublecrit(krev, kpubpaziente, self._kpub)
+
+        #Ottenimento nuovo codice revoca
+        CdR = self._obtainCdR()
+        list[1] = CdR
+
+        base = [IDreferto, CdR, True]
+
+        trev = S.Sign(self._kpriv, Serializer.serialize(base))
+
+        DdRev = [krevclinica, krevpaziente, trev, CdR, crevoca]
+
+        message = [self._ID, oc.REVOKE, IDpaziente, IDreferto, DdRev]
+
+        IDrm = self._ca.getRMID()
+
+        self.send(IDrm, message)
+
+    def updateReferto(self, IDpaziente, IDreferto, referto):
+        if IDpaziente not in self._database:
+            print("Referto non esistente")
+            return
+        if IDreferto not in self._database[IDpaziente]:
+            print("Referto non esistente")
+            return
+
+        list = self._database[IDpaziente][IDreferto]
+        list[0] = False
+        list[3] = referto
+
+        ksim = PiSim.GenSim()
+        sign = S.Sign(self._kpriv, Serializer.serialize(referto))
+
+        refsign = [sign, referto]
+        creferto = PiSim.EncSim(ksim, Serializer.serialize(refsign))
+
+        kpubpaziente = self._ca.getPublic(IDpaziente)
+
+        ksimpaziente, ksimclinica = self._doublecrit(ksim, kpubpaziente, self._kpub)
+
+        CdR = self._database[IDpaziente][IDreferto][1]
+
+        base = [IDreferto, CdR, False]
+
+        trev = S.Sign(self._kpriv, Serializer.serialize(base))
+
+        DdRef = [ksimclinica, ksimpaziente, trev, creferto]
+
+        message = [self._ID, oc.UPDATE, IDpaziente, IDreferto, DdRef]
+
+        IDrm = self._ca.getRMID()
+
+        self.send(IDrm, message)
+
 
     def send(self, dest, m):
         print(self._ID + ": Invio Messaggio")
@@ -86,3 +162,7 @@ class Clinica(User):
     def receive(self, c):
         print(self._ID + ": Messaggio ottenuto")
         super().receive(c)
+
+    def _obtainCdR(self):
+        a, b, c = random.randint(0, 9), random.randint(0, 9), random.randint(0, 9)
+        return str(a) + str(b) + str(c)
