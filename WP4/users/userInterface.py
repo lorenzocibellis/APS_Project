@@ -21,6 +21,12 @@ class User(Comunication):
         k2c = PiAsim.EncAsim(k2, k)
         return k1c,k2c
 
+    # metodo che permette la decifratura tramite cifratura asimmetrica di 2 chiavi cifrate k1c e k2c usando una chiave k
+    def _doubleDecrit(self, k, k1c, k2c):
+        k1 = PiAsim.DecAsim(k, k1c)
+        k2 = PiAsim.DecAsim(k, k2c)
+
+
     def receive(self, c):
         data = super().receive(c)
         if data is None:
@@ -39,6 +45,10 @@ class User(Comunication):
             self._receiveKey(m)
         elif op == oc.AUD_SEND:
             self._receiveAudit(m)
+        elif op == oc.VIS_REQ:
+            self._receiveRequest(m)
+        elif op == oc.CONFIRM:
+            self._receiveConfirm(m)
         else:
             self._notify(nc.INVALID_OP)
 
@@ -55,6 +65,11 @@ class User(Comunication):
             print(self._ID + ": Operazione non effettuata: operazione non valida")
 
 
+    def _receiveRequest(self, m):
+        self._notify(nc.INVALID_OP)
+
+    def _receiveConfirm(self, m):
+        self._notify(nc.INVALID_OP)
 
     def _receiveAudit(self, message):
         if len(message) != 5:
@@ -188,7 +203,7 @@ class User(Comunication):
         self.send(IDrm, message)
 
     def _receiveKey(self, message):
-        print("Operazione non valida")
+        self._notify(nc.INVALID_OP)
         return
 
     def _aud_request(self, IDpaziente, IDreferto, auth):

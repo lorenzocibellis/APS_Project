@@ -33,6 +33,7 @@ while 1:
         
         """
 
+"""
 from CentralSystem.data.database import Database
 from CentralSystem.rm import RM
 from thirdParties.ca import CA
@@ -83,3 +84,52 @@ if __name__ == "__main__":
         print(registro)
     else:
         print("Registro di audit non presente o non valido.")
+"""
+
+from CentralSystem.data.database import Database
+from CentralSystem.rm import RM
+from thirdParties.ca import CA
+from users.clinic import Clinica
+from users.patient import Paziente
+from users.medic import Medico
+from globalClasses.enumerations import Role
+
+if __name__ == "__main__":
+    # 1. Inizializzazione CA, Database e Resource Manager (RM)
+    ca = CA()
+    db = Database()
+    rm = RM(Role.RM, ca, db)
+
+    # 2. Inizializzazione degli attori
+    paziente = Paziente(ca, rm)
+    clinica = Clinica(ca, rm)
+    medico = Medico(ca, rm)
+
+    id_paziente = paziente._ID
+    id_referto_locale = "REF_2026_001"
+    id_referto_univoco = f"{clinica._ID}_{id_referto_locale}"
+
+    print("=== TEST 1: CARICAMENTO REFERTO (STORE) ===")
+    referto_iniziale = "Referto Iniziale: Valori ematici nella norma."
+    clinica.createAndSendReferto(id_paziente, id_referto_locale, referto_iniziale)
+
+    print("\n=== TEST 2: RICHIESTA AUTORIZZAZIONE DAL MEDICO (VIS_REQ & CONFIRM) ===")
+    # Il medico richiede l'autorizzazione al paziente (interattivo: inserire 1 a terminale)
+    medico.vis_request(id_paziente, id_referto_univoco)
+
+    print("\n=== TEST 3: RICHIESTA REFERTO DAL MEDICO (REF_REQ) ===")
+    # Il medico richiede il referto cifrato al RM usando il token di autorizzazione ottenuto
+    medico.ref_request(id_paziente, id_referto_univoco)
+
+    print("\n=== TEST 4: RICHIESTA REGISTRO DI AUDIT DAL MEDICO (AUD_REQ) ===")
+    # Il medico richiede il registro di tracciamento al RM per il referto del paziente
+    medico.aud_request(id_paziente, id_referto_univoco)
+
+    print("\n=== TEST 5: VERIFICA REGISTRO DI AUDIT OTTENUTO DAL MEDICO ===")
+    # Verifica del registro salvato nel sotto-dizionario del medico [id_paziente][id_referto]
+    if id_paziente in medico._registers and id_referto_univoco in medico._registers[id_paziente]:
+        registro = medico._registers[id_paziente][id_referto_univoco]
+        print("Registro di audit valido ottenuto dal Medico:")
+        print(registro)
+    else:
+        print("Registro di audit non presente o non valido per il Medico.")
