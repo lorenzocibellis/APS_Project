@@ -31,8 +31,10 @@ class User(Comunication):
 
         if op == oc.NOTIFY:
             self._notify(m[2])
-        if op == oc.REF_SEND:
-            self._obtainDocuments(m)
+        elif op == oc.REF_SEND:
+            self._receiveDocuments(m)
+        elif op == oc.KEY_SEND:
+            self._receiveKey(m)
 
     def _notify(self,code):
         if code == nc.SUCCESS:
@@ -45,11 +47,14 @@ class User(Comunication):
             print(self._ID + ": Operazione non effettuata: identificativo inesistente")
 
 
-    def _obtainDocuments(self, message):
+    def _receiveDocuments(self, message):
         if len(message) != 8:
             self._notify(nc.INVALID_DATA)
             return
 
+        if message[0] != self._ca.getRMID():
+            print("Mittente non valido")
+            return
         #Ottenenedo dati di Pre-Condizione
         IDsender, _, IDclinica, IDpaziente, IDreferto, FdR, DdRevoca, DdReferto = message
         kpub = self._ca.getPublic(IDclinica)
@@ -119,6 +124,14 @@ class User(Comunication):
         return ksim, krev
 
 
+    def _ref_request(self, IDpaziente, IDreferto, auth):
+        message = [self._ID, oc.REF_REQ, IDpaziente, IDreferto, auth]
+        IDrm = self._ca.getRMID()
+        self.send(IDrm, message)
+
+    def _receiveKey(self, message):
+        print("Operazione non valida")
+        return
 
 
 

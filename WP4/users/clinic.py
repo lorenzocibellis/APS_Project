@@ -155,6 +155,10 @@ class Clinica(User):
         self.send(IDrm, message)
 
 
+    def ref_request(self, IDpaziente, IDreferto):
+        super()._ref_request(IDpaziente, IDreferto, None)
+
+
     def send(self, dest, m):
         print(self._ID + ": Invio Messaggio")
         super().send(dest, m)

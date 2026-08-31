@@ -227,8 +227,51 @@ class RM(Comunication):
 
         error = self._db.updateItem(IDpaziente, IDreferto, ksimp, ksimc, trev, cref)
         if error == nc.SUCCESS:
-            self._db.addAudit(IDpaziente, IDreferto, IDrichiedente, oc.REVOKE, cnt, signaudit)
+            self._db.addAudit(IDpaziente, IDreferto, IDrichiedente, oc.UPDATE, cnt, signaudit)
         self._notifyMessage(IDrichiedente ,error)
+
+
+    def _getKey(self, m, cnt, signaudit):
+        if len(m) != 3:
+            self._notifyMessage(m[0], nc.INVALID_DATA)
+            return
+
+        print("---RM: Elaborazione Invio chiavi---")
+        print(m)
+        IDrichiedente, _, IDreferto = m
+
+        #Controllo che il richiedente sia un paziente
+        if self._ca.getRole(IDrichiedente) != Role.PAZIENTE:
+            self._notifyMessage(IDrichiedente, nc.UNAUTH)
+            return
+
+        #Controllo che il referto esista in memoria
+        #ciò vale anche per ottenere il referto associato al richiedente
+        if not self._db.exists(IDrichiedente,IDreferto):
+            self._notifyMessage(IDrichiedente, nc.INEX)
+            return
+
+        #si aggiunge l'evento al registro audit
+        self._db.addAudit(IDrichiedente, IDreferto, IDrichiedente, oc.KEY_REQ, cnt, signaudit)
+
+        #si inviano le chiavi
+        self._sendKeys(IDrichiedente, IDreferto)
+        return
+
+
+    def _sendKeys(self, IDpaziente, IDreferto):
+        print("RM: Preparazione messaggio di invio delle chiavi")
+        op = oc.KEY_SEND
+        sender = self._ID
+
+        ksim, krev = self._db.getKeyPaziente(IDpaziente, IDreferto)
+
+        # combinazione dati nel messaggio
+        message = [sender, op, IDpaziente, IDreferto, krev, ksim]
+
+        print("--RM: Messaggio creato--")
+        self.send(IDpaziente, message)
+        return
 
 
     def _notifyMessage(self, receiver, code):

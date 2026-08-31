@@ -26,3 +26,14 @@ class Medico(User):
             krev = self._krev[IDpaziente]
 
         return ksim, krev
+
+    def ref_request(self, IDpaziente, IDreferto):
+        if IDpaziente not in self._auth:
+            print("Paziente non presente")
+            return
+        if IDreferto not in self._auth[IDpaziente]:
+            print("Referto non presente")
+            return
+        auth = self._auth[IDpaziente][IDreferto]
+
+        super()._ref_request(IDpaziente, IDreferto, auth)
