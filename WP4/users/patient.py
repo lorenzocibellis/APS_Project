@@ -27,9 +27,11 @@ class Paziente(User):
         self._keys[IDreferto] = [krev, ksim]
         self._notify(nc.SUCCESS)
 
+    def aud_request(self, IDreferto):
+        self._aud_request(self._ID, IDreferto, None)
 
-    def ref_request(self, IDpaziente, IDreferto):
-        super()._ref_request(IDpaziente, IDreferto, None)
+    def ref_request(self, IDreferto):
+        self._ref_request(self._ID, IDreferto, None)
 
     def key_request(self,IDreferto):
         message = [self._ID, oc.KEY_REQ, IDreferto]

@@ -80,7 +80,7 @@ class RM(Comunication):
         if len(m) != 5:
             self._notifyMessage(m[0], nc.INVALID_DATA)
             return
-        print("RM: Elaborazione Caricamento Referto")
+        print("RM: Elaborazione Richiesta Referto")
         print(m)
         IDrichiedente, _, IDpaziente, IDreferto, Auth = m
 
@@ -127,7 +127,7 @@ class RM(Comunication):
                 return
 
         #si aggiunge l'evento al registro audit
-        self._db.addAudit(IDpaziente, IDreferto, IDclinica, oc.REF_REQ, cnt, signaudit)
+        self._db.addAudit(IDpaziente, IDreferto, IDrichiedente, oc.REF_REQ, cnt, signaudit)
 
         self._sendReferto(IDpaziente, IDreferto, IDrichiedente)
         return
@@ -271,6 +271,79 @@ class RM(Comunication):
 
         print("--RM: Messaggio creato--")
         self.send(IDpaziente, message)
+        return
+
+    def _getAuditing(self, m, cnt, signaudit):
+        if len(m) != 5:
+            self._notifyMessage(m[0], nc.INVALID_DATA)
+            return
+
+        print("RM: Elaborazione Richiesta Auditing")
+        print(m)
+
+        IDrichiedente, _, IDpaziente, IDreferto, Auth = m
+
+        #Controllo che il referto esista in memoria
+        if not self._db.exists(IDpaziente,IDreferto):
+            self._notifyMessage(IDrichiedente, nc.INEX)
+            return
+
+        role = self._ca.getRole(IDrichiedente)
+
+        IDclinica = self._db.getIDclinica(IDpaziente, IDreferto)
+        #CASO SPECIALE: autorizzazione per il medico
+        if role == Role.MEDICO:
+            print("RM: Controllo autorizzazione per medico " + IDrichiedente)
+            if len(Auth) != 5:
+                self._notifyMessage(IDrichiedente, nc.INVALID_DATA)
+                return
+            sign, IDmedico, IDpazienteAuth, IDrefertoAuth, TimeStamp = Auth
+
+            #controllo sincronizzazione dati
+            if IDmedico != IDrichiedente or IDpazienteAuth != IDpaziente or IDrefertoAuth != IDreferto:
+                self._notifyMessage(IDrichiedente, nc.INVALID_DATA)
+                return
+
+            #controllo scadenza autorizzazione
+            if not isinstance(TimeStamp, datetime):
+                self._notifyMessage(IDrichiedente, nc.INVALID_DATA)
+                return
+            if  TimeStamp + timedelta(days = self._daysToExpire) < datetime.now(timezone.utc):
+                self._notifyMessage(IDrichiedente, nc.UNAUTH)
+                return
+
+            # controllo autorizzazione
+            kpub = self._ca.getPublic(IDpaziente)
+            if not S.Vrfy(kpub, Serializer.serialize(Auth[1:]), sign):
+                self._notifyMessage(IDrichiedente, nc.UNAUTH)
+                return
+
+            print("RM: Autorizzazione consentita a :" + IDrichiedente)
+
+
+        # Si controlla che chi ha richiesto il registro sia autorizzato ad ottenerli
+        elif IDrichiedente != IDpaziente and IDrichiedente != IDclinica:
+                self._notifyMessage(IDrichiedente, nc.UNAUTH)
+                return
+
+        #si aggiunge l'evento al registro audit
+        self._db.addAudit(IDpaziente, IDreferto, IDrichiedente, oc.AUD_REQ, cnt, signaudit)
+
+        self._sendAudit(IDpaziente, IDreferto, IDrichiedente)
+        return
+
+
+    def _sendAudit(self, IDpaziente, IDreferto, receiver):
+        register = self._db.getItem(IDpaziente, IDreferto).getRegister()
+        print("RM: Preparazione messaggio di invio del registro di auditing")
+        op = oc.AUD_SEND
+        sender = self._ID
+
+        # combinazione dati nel messaggio
+        message = [sender, op, IDpaziente, IDreferto, register]
+
+        print("RM: Messaggio creato")
+        self.send(receiver, message)
         return
 
 

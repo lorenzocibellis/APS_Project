@@ -32,6 +32,7 @@ while 1:
         print("Messaggio non inviato")
         
         """
+
 from CentralSystem.data.database import Database
 from CentralSystem.rm import RM
 from thirdParties.ca import CA
@@ -58,12 +59,9 @@ if __name__ == "__main__":
     clinica.createAndSendReferto(id_paziente, id_referto_locale, referto_iniziale)
 
     print("\n=== TEST 2: RICHIESTA REFERTO DAL PAZIENTE (REF_REQ) ===")
-    # Il paziente richiede il referto (gestito tramite _receiveDocuments)
-    paziente.ref_request(id_paziente, id_referto_univoco)
+    paziente.ref_request(id_referto_univoco)
 
-    print("\n=== TEST 3: RICHIESTA E SALVATAGGIO CHIAVI (KEY_REQ) ===")
-    # Invia la richiesta per la chiave: RM risponde con KEY_SEND
-    # attivando _receiveKey del paziente per memorizzarle in self._keys
+    print("\n=== TEST 3: RICHIESTA CHIAVI DAL PAZIENTE (KEY_REQ) ===")
     paziente.key_request(id_referto_univoco)
 
     print("\n=== TEST 4: REVOCA REFERTO (REVOKE) ===")
@@ -74,5 +72,14 @@ if __name__ == "__main__":
     referto_aggiornato = "Referto Rettificato: Parametri corretti e confermati."
     clinica.updateReferto(id_paziente, id_referto_univoco, referto_aggiornato)
 
-    print("\n=== TEST 6: VERIFICA DOPO AGGIORNAMENTO (REF_REQ) ===")
-    paziente.ref_request(id_paziente, id_referto_univoco)
+    print("\n=== TEST 6: RICHIESTA REGISTRO DI AUDIT (AUD_REQ) ===")
+    # Il paziente richiede al RM il registro di tracciamento per il referto specificato
+    paziente.aud_request(id_referto_univoco)
+
+    print("\n=== TEST 7: VERIFICA REGISTRO DI AUDIT OTTENUTO ===")
+    # Stampa del registro salvato in self._registers dell'utente previa verifica crittografica degli audit
+    if id_referto_univoco in paziente._registers:
+        registro = paziente._registers[id_referto_univoco]
+        print(registro)
+    else:
+        print("Registro di audit non presente o non valido.")

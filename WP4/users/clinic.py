@@ -156,8 +156,10 @@ class Clinica(User):
 
 
     def ref_request(self, IDpaziente, IDreferto):
-        super()._ref_request(IDpaziente, IDreferto, None)
+        self._ref_request(IDpaziente, IDreferto, None)
 
+    def aud_request(self, IDpaziente, IDreferto):
+        self._aud_request(IDpaziente, IDreferto, None)
 
     def send(self, dest, m):
         print(self._ID + ": Invio Messaggio")

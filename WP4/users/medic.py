@@ -26,14 +26,24 @@ class Medico(User):
             krev = self._krev[IDpaziente]
 
         return ksim, krev
-
-    def ref_request(self, IDpaziente, IDreferto):
+    def aud_request(self, IDpaziente, IDreferto):
         if IDpaziente not in self._auth:
-            print("Paziente non presente")
+            print("Autorizzazione non ottenuta da parte del Paziente " + IDpaziente)
             return
         if IDreferto not in self._auth[IDpaziente]:
-            print("Referto non presente")
+            print("Autorizzazioen non ottenuta per il referto " + IDreferto)
             return
         auth = self._auth[IDpaziente][IDreferto]
 
-        super()._ref_request(IDpaziente, IDreferto, auth)
+        self._aud_request(IDpaziente, IDreferto, auth)
+
+    def ref_request(self, IDpaziente, IDreferto):
+        if IDpaziente not in self._auth:
+            print("Autorizzazione non ottenuta da parte del Paziente " + IDpaziente)
+            return
+        if IDreferto not in self._auth[IDpaziente]:
+            print("Autorizzazioen non ottenuta per il referto " + IDreferto)
+            return
+        auth = self._auth[IDpaziente][IDreferto]
+
+        self._ref_request(IDpaziente, IDreferto, auth)

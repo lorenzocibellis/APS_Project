@@ -1,17 +1,19 @@
 import random
+from io import UnsupportedOperation
 
 from cryptoOperation.serializer import Serializer
 from comunicationInterface import Comunication
-from cryptoOperation.cryptOp import PiSim, PiAsim, S
-from globalClasses.enumerations import OperationCode as oc, NotifyCode as nc
-
+from cryptoOperation.cryptOp import PiSim, PiAsim, S, H
+from globalClasses.enumerations import OperationCode as oc, NotifyCode as nc, Role
 
 
 class User(Comunication):
 
+
     def __init__(self,role, ca, rm):
         super().__init__(role, ca)
         self._rm = rm
+        self._registers = dict()
 
     #metodo che permette la cifratura di una chiave k usando 2 chiavi diverse k1 e k2 tramite cifrtura asimmetrica
     def _doublecrit(self,k, k1, k2):
@@ -35,6 +37,10 @@ class User(Comunication):
             self._receiveDocuments(m)
         elif op == oc.KEY_SEND:
             self._receiveKey(m)
+        elif op == oc.AUD_SEND:
+            self._receiveAudit(m)
+        else:
+            self._notify(nc.INVALID_OP)
 
     def _notify(self,code):
         if code == nc.SUCCESS:
@@ -45,7 +51,59 @@ class User(Comunication):
             print(self._ID + ": Operazione non effettuata: Autorizzazione negata")
         elif code == nc.INEX:
             print(self._ID + ": Operazione non effettuata: identificativo inesistente")
+        elif code == nc.INVALID_OP:
+            print(self._ID + ": Operazione non effettuata: operazione non valida")
 
+
+
+    def _receiveAudit(self, message):
+        if len(message) != 5:
+            self._notify(nc.INVALID_DATA)
+            return
+
+        if message[0] != self._ca.getRMID():
+            self._notify(nc.INVALID_DATA)
+            return
+
+        #Spacchettamento messaggio
+        IDsender, _, IDpaziente, IDreferto, register = message
+
+        if not self._verifyRegister(register):
+            self._notify(nc.INVALID_DATA)
+            return
+        else:
+            print("Registro di tracciamento ottenuto valido!")
+            print(register)
+
+        if self._role == Role.PAZIENTE:
+            if self._ID != IDpaziente:
+                self._notify(nc.INVALID_DATA)
+                return
+            else:
+                self._registers[IDreferto] = register
+        else:
+            if IDpaziente not in self._registers:
+                self._registers[IDpaziente] = dict()
+            self._registers[IDpaziente][IDreferto] = register
+
+    def _verifyRegister(self,r):
+        for index in range(len(r)):
+            audit, hash = r.getAudit(index)
+
+            ID, op, cnt, sign = audit.getAll()
+            kpub = self._ca.getPublic(ID)
+
+            if not S.Vrfy(kpub, Serializer.serialize([ID, op, cnt]), sign):
+                return False
+
+            if index == 0:
+                precHash = r.getGenesis()
+            else:
+                _, precHash = r.getAudit(index - 1)
+
+            if not H.HVrfy(Serializer.serialize(audit) + b"|" + precHash, hash):
+                return False
+        return True
 
     def _receiveDocuments(self, message):
         if len(message) != 8:
@@ -132,6 +190,12 @@ class User(Comunication):
     def _receiveKey(self, message):
         print("Operazione non valida")
         return
+
+    def _aud_request(self, IDpaziente, IDreferto, auth):
+        message = [self._ID, oc.AUD_REQ, IDpaziente, IDreferto, auth]
+        IDrm = self._ca.getRMID()
+        self.send(IDrm, message)
+
 
 
 

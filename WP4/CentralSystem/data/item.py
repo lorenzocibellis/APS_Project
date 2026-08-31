@@ -40,6 +40,9 @@ class Item:
     def isRevoked(self):
         return self._flagRevoca
 
+    def getRegister(self):
+        return self._register
+
     def getCdR(self):
         return self._CdR
 
