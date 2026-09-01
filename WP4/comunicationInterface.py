@@ -23,6 +23,10 @@ class Comunication:
     def _notifyMessage(self, receiver, code):
         pass
 
+    def _existentID(self, ID):
+        if self._ca.getRole(ID) is None:
+            return False
+        return True
 
     # inizializzazione identità presso una CA
     def _obtainIdentity(self):

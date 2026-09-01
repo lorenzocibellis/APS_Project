@@ -69,6 +69,9 @@ class Medico(User):
         #spacchettamento messaggio
         IDmittente, _, IDmedico, IDreferto, confirm, token = m
 
+        if self._existentID(IDmittente) is None:
+            print("Utente non esistente")
+            return
         if self._ca.getRole(IDmittente) != Role.PAZIENTE:
             self._notify(nc.INVALID_DATA)
             return

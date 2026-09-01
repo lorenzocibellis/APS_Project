@@ -65,6 +65,14 @@ class RM(Comunication):
         IDclinica, _ , IDpaziente , IDreferto, DdR = m
         ksimc, ksimp , trev, CdR ,creferto = DdR
 
+        if self._existentID(IDclinica) is None:
+            print("Utente non esistente")
+            return
+
+        if self._ca.getRole(IDclinica) != Role.CLINICA:
+            self._notifyMessage(IDclinica, nc.UNAUTH)
+            return
+
         #controllo trev
         kpub = self._ca.getPublic(IDclinica)
         if kpub is None:
@@ -87,6 +95,10 @@ class RM(Comunication):
         print("RM: Elaborazione Richiesta Referto")
         print(m)
         IDrichiedente, _, IDpaziente, IDreferto, Auth = m
+
+        if self._existentID(IDrichiedente) is None:
+            print("Utente non esistente")
+            return
 
         #Controllo che il referto esista in memoria
         if not self._db.exists(IDpaziente,IDreferto):
@@ -182,6 +194,10 @@ class RM(Comunication):
         print("RM: Elaborazione Revoca Referto")
         IDrichiedente, _, IDpaziente, IDreferto, DdR = m
 
+        if self._existentID(IDrichiedente) is None:
+            print("Utente non esistente")
+            return
+
         if len(DdR) != 5:
             self._notifyMessage(m[0], nc.INVALID_DATA)
             return
@@ -214,6 +230,10 @@ class RM(Comunication):
 
         print("Elaborazione aggiornamento referto")
         IDrichiedente, _, IDpaziente, IDreferto, DdR = m
+
+        if self._existentID(IDrichiedente) is None:
+            print("Utente non esistente")
+            return
 
         if len(DdR) != 4:
             self._notifyMessage(m[0], nc.INVALID_DATA)
@@ -248,6 +268,10 @@ class RM(Comunication):
         print("RM: Elaborazione Invio chiavi")
         print(m)
         IDrichiedente, _, IDreferto = m
+
+        if self._existentID(IDrichiedente) is None:
+            print("Utente non esistente")
+            return
 
         #Controllo che il richiedente sia un paziente
         if self._ca.getRole(IDrichiedente) is None or self._ca.getRole(IDrichiedente) != Role.PAZIENTE:
@@ -291,6 +315,10 @@ class RM(Comunication):
         print(m)
 
         IDrichiedente, _, IDpaziente, IDreferto, Auth = m
+
+        if self._existentID(IDrichiedente) is None:
+            print("Utente non esistente")
+            return
 
         #Controllo che il referto esista in memoria
         if not self._db.exists(IDpaziente,IDreferto):

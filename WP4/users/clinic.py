@@ -24,7 +24,7 @@ class Clinica(User):
         # creazione nuovo ID del referto
         IDreferto = self._ID + "_" + IDreferto
         # Controllo unicità del referto
-        if self._ca.getRole(IDpaziente) is None:
+        if self._existentID(IDpaziente)is None:
             print("Utente non esistente")
             return
 
@@ -89,7 +89,7 @@ class Clinica(User):
 
     #Revoca referto
     def revokeReferto(self, IDpaziente, IDreferto, MdR):
-        if self._ca.getRole(IDpaziente) is None:
+        if self._existentID(IDpaziente) is None:
             print("Utente non esistente")
             return
         if IDpaziente not in self._database:
@@ -130,7 +130,7 @@ class Clinica(User):
         self.send(IDrm, message)
 
     def updateReferto(self, IDpaziente, IDreferto, referto):
-        if self._ca.getRole(IDpaziente) is None:
+        if self._existentID(IDpaziente) is None:
             print("Utente non esistente")
             return
         if IDpaziente not in self._database:
@@ -170,13 +170,13 @@ class Clinica(User):
 
 
     def ref_request(self, IDpaziente, IDreferto):
-        if self._ca.getRole(IDpaziente) is None:
+        if self._existentID(IDpaziente) is None:
             print("Utente non esistente")
             return
         self._ref_request(IDpaziente, IDreferto, None)
 
     def aud_request(self, IDpaziente, IDreferto):
-        if self._ca.getRole(IDpaziente) is None:
+        if self._existentID(IDpaziente) is None:
             print("Utente non esistente")
             return
         self._aud_request(IDpaziente, IDreferto, None)
