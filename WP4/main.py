@@ -247,7 +247,6 @@ def main():
     ca = CA()
     db = Database()
     rm = RM(Role.RM, ca, db)
-    verbose = False
     paziente = Paziente(ca, rm)
     clinica = Clinica(ca, rm)
     medico = Medico(ca, rm)
@@ -265,11 +264,6 @@ def main():
         print("Seleziona l'utente con cui operare:")
         for key, (ruolo, utente) in utenti.items():
             print(f"{key}. {ruolo} (ID: {utente._ID})")
-        if verbose:
-            mod = "Disattiva modalità verbose"
-        else:
-            mod = "Attiva modalità verbose"
-        print("4. " + mod)
         print("0. Esci")
 
         scelta = input("Scelta: ").strip()
@@ -280,8 +274,6 @@ def main():
             menu_paziente(paziente)
         elif scelta == "3":
             menu_medico(medico)
-        elif scelta == "4":
-            verbose = not verbose
         elif scelta == "0":
             print("\nChiusura dell'applicazione.")
             break

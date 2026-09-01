@@ -37,6 +37,7 @@ class Clinica(User):
 
         #dato nel database gestito come [ Flag, CdR, MdR, referto ]
         self._database[IDpaziente][IDreferto] = [False, None, None, referto]
+        print("\n" + self._ID + ": referto memorizzato come " + IDreferto)
         return IDreferto
 
     def sendReferto(self, IDpaziente, IDreferto):
