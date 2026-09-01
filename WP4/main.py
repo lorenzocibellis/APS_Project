@@ -85,7 +85,7 @@ if __name__ == "__main__":
     else:
         print("Registro di audit non presente o non valido.")
 """
-
+"""
 from CentralSystem.data.database import Database
 from CentralSystem.rm import RM
 from thirdParties.ca import CA
@@ -133,3 +133,161 @@ if __name__ == "__main__":
         print(registro)
     else:
         print("Registro di audit non presente o non valido per il Medico.")
+
+"""
+
+from CentralSystem.data.database import Database
+from CentralSystem.rm import RM
+from thirdParties.ca import CA
+from users.clinic import Clinica
+from users.patient import Paziente
+from users.medic import Medico
+from globalClasses.enumerations import Role
+
+
+def menu_clinica(clinica):
+    while True:
+        print(f"\n--- MENU CLINICA (ID: {clinica._ID}) ---")
+        print("1. Crea e Invia Referto")
+        print("2. Revoca Referto")
+        print("3. Aggiorna Referto")
+        print("0. Torna al menu principale")
+
+        scelta = input("Seleziona un'operazione: ").strip()
+
+        if scelta == "1":
+            id_paziente = input("ID Paziente: ").strip()
+            id_referto_locale = input("ID Referto Locale (es. REF_001): ").strip()
+            contenuto = input("Contenuto del referto: ").strip()
+            clinica.createAndSendReferto(id_paziente, id_referto_locale, contenuto)
+        elif scelta == "2":
+            id_paziente = input("ID Paziente: ").strip()
+            id_referto = input("ID Referto Univoco (es. CLINICA_ID_REF_001): ").strip()
+            motivo = input("Motivo della revoca: ").strip()
+            clinica.revokeReferto(id_paziente, id_referto, motivo)
+        elif scelta == "3":
+            id_paziente = input("ID Paziente: ").strip()
+            id_referto = input("ID Referto Univoco (es. CLINICA_ID_REF_001): ").strip()
+            nuovo_contenuto = input("Nuovo contenuto referto: ").strip()
+            clinica.updateReferto(id_paziente, id_referto, nuovo_contenuto)
+        elif scelta == "0":
+            break
+        else:
+            print("Opzione non valida.")
+
+
+def menu_paziente(paziente):
+    while True:
+        print(f"\n--- MENU PAZIENTE (ID: {paziente._ID}) ---")
+        print("1. Richiedi Chiavi Referto (key_request)")
+        print("2. Richiedi Referto Cifrato (ref_request)")
+        print("3. Richiedi Registro di Audit (aud_request)")
+        print("4. Visualizza Registri di Audit Salvati")
+        print("0. Torna al menu principale")
+
+        scelta = input("Seleziona un'operazione: ").strip()
+
+        if scelta == "1":
+            id_referto = input("ID Referto Univoco: ").strip()
+            paziente.key_request(id_referto)
+        elif scelta == "2":
+            id_referto = input("ID Referto Univoco: ").strip()
+            paziente.ref_request(id_referto)
+        elif scelta == "3":
+            id_referto = input("ID Referto Univoco: ").strip()
+            paziente.aud_request(id_referto)
+        elif scelta == "4":
+            print("\n[Registri di Audit salvati localmente]")
+            if paziente._registers:
+                for ref_id, reg in paziente._registers.items():
+                    print(f"-> Referto {ref_id}:\n{reg}")
+            else:
+                print("Nessun registro presente.")
+        elif scelta == "0":
+            break
+        else:
+            print("Opzione non valida.")
+
+
+def menu_medico(medico):
+    while True:
+        print(f"\n--- MENU MEDICO (ID: {medico._ID}) ---")
+        print("1. Richiedi Autorizzazione al Paziente (vis_request)")
+        print("2. Richiedi Referto Cifrato a RM (ref_request)")
+        print("3. Richiedi Registro di Audit a RM (aud_request)")
+        print("4. Visualizza Autorizzazioni e Registri Salvati")
+        print("0. Torna al menu principale")
+
+        scelta = input("Seleziona un'operazione: ").strip()
+
+        if scelta == "1":
+            id_paziente = input("ID Paziente: ").strip()
+            id_referto = input("ID Referto Univoco: ").strip()
+            medico.vis_request(id_paziente, id_referto)
+        elif scelta == "2":
+            id_paziente = input("ID Paziente: ").strip()
+            id_referto = input("ID Referto Univoco: ").strip()
+            medico.ref_request(id_paziente, id_referto)
+        elif scelta == "3":
+            id_paziente = input("ID Paziente: ").strip()
+            id_referto = input("ID Referto Univoco: ").strip()
+            medico.aud_request(id_paziente, id_referto)
+        elif scelta == "4":
+            print("\n[Autorizzazioni Salvate]")
+            print(medico._auth)
+            print("\n[Registri di Audit Salvati]")
+            print(medico._registers)
+        elif scelta == "0":
+            break
+        else:
+            print("Opzione non valida.")
+
+
+def main():
+    ca = CA()
+    db = Database()
+    rm = RM(Role.RM, ca, db)
+    verbose = False
+    paziente = Paziente(ca, rm)
+    clinica = Clinica(ca, rm)
+    medico = Medico(ca, rm)
+
+    utenti = {
+        "1": ("Clinica", clinica),
+        "2": ("Paziente", paziente),
+        "3": ("Medico", medico)
+    }
+
+    while True:
+        print("\n==========================================")
+        print("   SISTEMA DI GESTIONE REFERTI MEDICI    ")
+        print("==========================================")
+        print("Seleziona l'utente con cui operare:")
+        for key, (ruolo, utente) in utenti.items():
+            print(f"{key}. {ruolo} (ID: {utente._ID})")
+        if verbose:
+            mod = "Disattiva modalità verbose"
+        else:
+            mod = "Attiva modalità verbose"
+        print("4. " + mod)
+        print("0. Esci")
+
+        scelta = input("Scelta: ").strip()
+
+        if scelta == "1":
+            menu_clinica(clinica)
+        elif scelta == "2":
+            menu_paziente(paziente)
+        elif scelta == "3":
+            menu_medico(medico)
+        elif scelta == "4":
+            verbose = not verbose
+        elif scelta == "0":
+            print("\nChiusura dell'applicazione.")
+            break
+        else:
+            print("Scelta non valida.")
+
+
+if __name__ == "__main__":
+    main()

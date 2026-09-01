@@ -52,7 +52,8 @@ class CA:
         elif r == "M":
             return self._mdict[ID][0]
         else:
-            raise ValueError
+            print("Utente non esistente")
+            return None
 
     def getRole(self,ID):
         r = ID[0]
@@ -65,7 +66,8 @@ class CA:
         elif r == "M":
             return self._mdict[ID][1]
         else:
-            raise ValueError
+            print("Utente non esistente")
+            return None
 
     def getRMID(self):
         return self._rm[0]

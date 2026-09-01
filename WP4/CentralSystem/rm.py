@@ -27,7 +27,7 @@ class RM(Comunication):
         print("Elaborazione della richiesta")
         if op == oc.STORE:
             #controllo sincronizzazione dati tra mittente e messaggio
-            if self._ca.getRole(sender) != Role.CLINICA or sender != m[0]:
+            if self._ca.getRole(sender) is None or self._ca.getRole(sender) != Role.CLINICA or sender != m[0]:
                 self._notifyMessage(sender, nc.INVALID_DATA)
                 return
 
@@ -60,11 +60,15 @@ class RM(Comunication):
            self._notifyMessage(m[0], nc.INVALID_DATA)
            return
         print(m)
+
+        print("RM: Elaborazione caricamento referto")
         IDclinica, _ , IDpaziente , IDreferto, DdR = m
         ksimc, ksimp , trev, CdR ,creferto = DdR
 
         #controllo trev
         kpub = self._ca.getPublic(IDclinica)
+        if kpub is None:
+            self._notifyMessage(IDclinica, nc.INVALID_DATA)
         base = [IDreferto, CdR, False]
         if not S.Vrfy(kpub, Serializer.serialize(base), trev):
             self._notifyMessage(m[0], nc.INVALID_DATA)
@@ -90,6 +94,9 @@ class RM(Comunication):
             return
 
         role = self._ca.getRole(IDrichiedente)
+        if role is None:
+            self._notify(nc.INVALID_DATA)
+            return
 
         IDclinica = self._db.getIDclinica(IDpaziente, IDreferto)
         #CASO SPECIALE: autorizzazione per il medico
@@ -172,6 +179,7 @@ class RM(Comunication):
             self._notifyMessage(m[0], nc.INVALID_DATA)
             return
 
+        print("RM: Elaborazione Revoca Referto")
         IDrichiedente, _, IDpaziente, IDreferto, DdR = m
 
         if len(DdR) != 5:
@@ -204,6 +212,7 @@ class RM(Comunication):
             self._notifyMessage(m[0], nc.INVALID_DATA)
             return
 
+        print("Elaborazione aggiornamento referto")
         IDrichiedente, _, IDpaziente, IDreferto, DdR = m
 
         if len(DdR) != 4:
@@ -236,12 +245,12 @@ class RM(Comunication):
             self._notifyMessage(m[0], nc.INVALID_DATA)
             return
 
-        print("---RM: Elaborazione Invio chiavi---")
+        print("RM: Elaborazione Invio chiavi")
         print(m)
         IDrichiedente, _, IDreferto = m
 
         #Controllo che il richiedente sia un paziente
-        if self._ca.getRole(IDrichiedente) != Role.PAZIENTE:
+        if self._ca.getRole(IDrichiedente) is None or self._ca.getRole(IDrichiedente) != Role.PAZIENTE:
             self._notifyMessage(IDrichiedente, nc.UNAUTH)
             return
 
@@ -289,6 +298,8 @@ class RM(Comunication):
             return
 
         role = self._ca.getRole(IDrichiedente)
+        if role is None:
+            return
 
         IDclinica = self._db.getIDclinica(IDpaziente, IDreferto)
         #CASO SPECIALE: autorizzazione per il medico

@@ -24,6 +24,10 @@ class Clinica(User):
         # creazione nuovo ID del referto
         IDreferto = self._ID + "_" + IDreferto
         # Controllo unicità del referto
+        if self._ca.getRole(IDpaziente) is None:
+            print("Utente non esistente")
+            return
+
         if IDpaziente not in self._database:
             self._database[IDpaziente] = dict()
         else:
@@ -36,7 +40,9 @@ class Clinica(User):
         return IDreferto
 
     def sendReferto(self, IDpaziente, IDreferto):
-
+        if self._ca.getRole(IDpaziente) is None:
+            print("Utente non esistente")
+            return
         #Controllo nome del referto: se il nome non inizia con l'ID della clinica
         #(ID considerato locale) lo trasforma in ID globale
         if not IDreferto.startswith(self._ID + "_"):
@@ -54,6 +60,7 @@ class Clinica(User):
         sign = S.Sign(self._kpriv, Serializer.serialize(referto))
         refertosign = Serializer.serialize([sign, referto])
         creferto = PiSim.EncSim(ksim, refertosign)
+
 
         # si ottiene la chiave del paziente tramite CA
         kpubpaziente = self._ca.getPublic(IDpaziente)
@@ -81,6 +88,9 @@ class Clinica(User):
 
     #Revoca referto
     def revokeReferto(self, IDpaziente, IDreferto, MdR):
+        if self._ca.getRole(IDpaziente) is None:
+            print("Utente non esistente")
+            return
         if IDpaziente not in self._database:
             print("Referto non esistente")
             return
@@ -119,6 +129,9 @@ class Clinica(User):
         self.send(IDrm, message)
 
     def updateReferto(self, IDpaziente, IDreferto, referto):
+        if self._ca.getRole(IDpaziente) is None:
+            print("Utente non esistente")
+            return
         if IDpaziente not in self._database:
             print("Referto non esistente")
             return
@@ -156,12 +169,19 @@ class Clinica(User):
 
 
     def ref_request(self, IDpaziente, IDreferto):
+        if self._ca.getRole(IDpaziente) is None:
+            print("Utente non esistente")
+            return
         self._ref_request(IDpaziente, IDreferto, None)
 
     def aud_request(self, IDpaziente, IDreferto):
+        if self._ca.getRole(IDpaziente) is None:
+            print("Utente non esistente")
+            return
         self._aud_request(IDpaziente, IDreferto, None)
 
     def send(self, dest, m):
+
         print(self._ID + ": Invio Messaggio")
         super().send(dest, m)
 

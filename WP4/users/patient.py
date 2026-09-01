@@ -49,7 +49,7 @@ class Paziente(User):
 
         IDmedico, _, IDpaziente, IDreferto = m
 
-        if self._ca.getRole(IDmedico) != Role.MEDICO:
+        if self._ca.getRole is None or self._ca.getRole(IDmedico) != Role.MEDICO:
             self._notifyMessage(IDmedico, nc.UNAUTH)
             return
 
