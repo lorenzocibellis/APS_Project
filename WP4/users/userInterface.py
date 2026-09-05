@@ -101,9 +101,9 @@ class User(Comunication):
 
             #controllo sui contatori
             if ID not in control:
-                control[ID] = 1
+                control[ID] = cnt
             else:
-                if control[ID] + 1 != cnt:
+                if control[ID]  >= cnt:
                     return False
                 control[ID] = cnt
 
