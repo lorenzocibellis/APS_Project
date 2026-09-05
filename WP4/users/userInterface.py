@@ -91,10 +91,22 @@ class User(Comunication):
             self._registers[IDpaziente][IDreferto] = register
 
     def _verifyRegister(self,r):
+        control = dict()
         for index in range(len(r)):
             audit, hash = r.getAudit(index)
 
             ID, op, cnt, sign = audit.getAll()
+            if self._ca.getRole(ID) is None:
+                return False
+
+            #controllo sui contatori
+            if ID not in control:
+                control[ID] = 0
+            else:
+                if control[ID] + 1 != cnt:
+                    return False
+                control[ID] = cnt
+
             kpub = self._ca.getPublic(ID)
 
             if not S.Vrfy(kpub, Serializer.serialize([ID, op, cnt]), sign):

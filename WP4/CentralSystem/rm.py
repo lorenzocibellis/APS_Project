@@ -32,7 +32,7 @@ class RM(Comunication):
 
         print("Elaborazione della richiesta")
         if op == oc.STORE:
-            
+
             self._store(m, cnt, signaudit)
 
         elif op == oc.REF_REQ:
