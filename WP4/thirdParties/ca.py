@@ -46,10 +46,16 @@ class CA:
         if ID == self._rm[0]:
             return self._rm[2]
         elif r == "C":
+            if ID not in self._cdict:
+                return None
             return self._cdict[ID][0]
         elif r == "P":
+            if ID not in self._pdict:
+                return None
             return self._pdict[ID][0]
         elif r == "M":
+            if ID not in self._mdict:
+                return None
             return self._mdict[ID][0]
         else:
             print("Utente non esistente")
@@ -60,10 +66,16 @@ class CA:
         if ID == self._rm[0]:
             return self._rm[1]
         elif r == "C":
+            if ID not in self._cdict:
+                return None
             return self._cdict[ID][1]
         elif r == "P":
+            if ID not in self._pdict:
+                return None
             return self._pdict[ID][1]
         elif r == "M":
+            if ID not in self._mdict:
+                return None
             return self._mdict[ID][1]
         else:
             print("Utente non esistente")

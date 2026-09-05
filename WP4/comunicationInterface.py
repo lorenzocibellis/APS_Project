@@ -162,6 +162,18 @@ class Comunication:
 
         return [m , op, kpub]
 
+    def _notify(self,code):
+        if code == nc.SUCCESS:
+            print(self._ID + ": Operazione svolta con successo!!")
+        elif code == nc.INVALID_DATA:
+            print(self._ID + ": Operazione non effettuata: Dati non validi")
+        elif code == nc.UNAUTH:
+            print(self._ID + ": Operazione non effettuata: Autorizzazione negata")
+        elif code == nc.INEX:
+            print(self._ID + ": Operazione non effettuata: identificativo inesistente")
+        elif code == nc.INVALID_OP:
+            print(self._ID + ": Operazione non effettuata: operazione non valida")
+
 
 
 

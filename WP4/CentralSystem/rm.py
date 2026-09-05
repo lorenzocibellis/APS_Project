@@ -199,6 +199,10 @@ class RM(Comunication):
             print("Utente non esistente")
             return
 
+        if not self._db.exists(IDpaziente, IDreferto):
+            print("Referto non esistente")
+            return
+
         if self._db.isRevoked(IDpaziente, IDreferto):
             self._notifyMessage(IDrichiedente, nc.INVALID_OP)
             return
@@ -238,6 +242,10 @@ class RM(Comunication):
 
         if self._existentID(IDrichiedente) is False:
             print("Utente non esistente")
+            return
+
+        if not self._db.exists(IDpaziente, IDreferto):
+            print("Referto non esistente")
             return
 
         if not self._db.isRevoked(IDpaziente, IDreferto):

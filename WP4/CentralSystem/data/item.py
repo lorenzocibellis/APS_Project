@@ -43,9 +43,6 @@ class Item:
     def getRegister(self):
         return self._register
 
-    def getCdR(self):
-        return self._CdR
-
     def getIDpaziente(self):
         return self._IDpaziente
 

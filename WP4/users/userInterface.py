@@ -25,6 +25,7 @@ class User(Comunication):
     def _doubleDecrit(self, k, k1c, k2c):
         k1 = PiAsim.DecAsim(k, k1c)
         k2 = PiAsim.DecAsim(k, k2c)
+        return k1, k2
 
 
     def receive(self, c):
@@ -51,18 +52,6 @@ class User(Comunication):
             self._receiveConfirm(m)
         else:
             self._notify(nc.INVALID_OP)
-
-    def _notify(self,code):
-        if code == nc.SUCCESS:
-            print(self._ID + ": Operazione svolta con successo!!")
-        elif code == nc.INVALID_DATA:
-            print(self._ID + ": Operazione non effettuata: Dati non validi")
-        elif code == nc.UNAUTH:
-            print(self._ID + ": Operazione non effettuata: Autorizzazione negata")
-        elif code == nc.INEX:
-            print(self._ID + ": Operazione non effettuata: identificativo inesistente")
-        elif code == nc.INVALID_OP:
-            print(self._ID + ": Operazione non effettuata: operazione non valida")
 
 
     def _receiveRequest(self, m):
@@ -181,7 +170,7 @@ class User(Comunication):
 
     def _printDocuments(self, ref, f, rev):
         if f:
-            print("ATTENZIONE: DOCUMENTO REVOCATO\nMOTIVAZINE: " + rev)
+            print("ATTENZIONE: DOCUMENTO REVOCATO\nMOTIVAZIONE: " + rev)
         print(ref)
 
 

@@ -15,6 +15,7 @@ class Audit:
     def serialize(self):
         return Serializer.serialize(self)
 
+    @staticmethod
     def deserialize(serializedAudit):
         return Serializer.deserialize(serializedAudit)
 

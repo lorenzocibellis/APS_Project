@@ -4,7 +4,7 @@ class referto:
         self._data = data
 
     def __str__(self):
-        print(self._data)
+        return self._data
 
 
 
@@ -15,4 +15,4 @@ class MdR:
         self._data = data
 
     def __str__(self):
-        print(self._data)
+        return self._data
