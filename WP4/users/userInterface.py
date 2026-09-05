@@ -181,13 +181,27 @@ class User(Comunication):
 
 
     def _printDocuments(self, ref, f, rev):
+        print("\n" + "=" * 55)
         if f:
-            print("ATTENZIONE: DOCUMENTO REVOCATO\nMOTIVAZIONE: " + rev)
-        print(ref)
+            print("      ATTENZIONE: DOCUMENTO CLINICO REVOCATO   ️   ")
+            print("=" * 55)
+            print(f"  [STATO]: REVOCATO (Non valido a fini clinici)")
+            print(f"  [MOTIVAZIONE REVOCA]: {rev}")
+            print("-" * 55)
+            print("  [TESTO REFERTO (OBSOLETO)]:")
+            print(f"  {ref}")
+        else:
+            print("             ESITO CONSULTAZIONE REFERTO             ")
+            print("=" * 55)
+            print("  [STATO]: ATTIVO E VALIDO")
+            print("-" * 55)
+            print("  [CONTENUTO DEL REFERTO]:")
+            print(f"  {ref}")
+        print("=" * 55 + "\n")
 
 
     def _obtainKey(self, IDpaziente, IDreferto, IDclinica, DdRevoca, DdReferto):
-        #IDreferto in questa implementazione non serve a niente, utilizzato per override nel medico
+        #IDreferto in questa implementazione non serve, è utilizzato per override nel medico
         paziente = IDpaziente
         clinica = IDclinica
         ksim, krev =  DdReferto[0], DdRevoca[0]

@@ -35,9 +35,28 @@ class Audit:
         return [self.getID(), self.getOp(), self.getCnt(), self.getSign()]
 
 
+    _opDesc = {
+        "00": "Caricamento Referto",
+        "01": "Richiesta Referto",
+        "02": "Invio Referto",
+        "03": "Richiesta Visualizzazione",
+        "04": "Conferma Visualizzazione",
+        "05": "Richiesta Chiavi",
+        "06": "Invio Chiavi",
+        "07": "Revoca Referto",
+        "08": "Aggiornamento Referto",
+        "09": "Richiesta Auditing",
+        "10": "Invio Auditing",
+        "11": "Notifica",
+    }
+
     def __str__(self):
+        opCode = str(self._operation)
+        desc = self._opDesc.get(opCode, "")
+        opDisplay = f"{opCode} ({desc})" if desc else opCode
+
         s = "ID richiedente: " + self._IDrichiedente +\
-              "\nOperazione effettuata: " + str(self._operation) +\
+              "\nOperazione effettuata: " + opDisplay +\
               "\nValore del contatore: " + str(self._cnt) +\
               "\nFirma: " + str(self._signaudit)
         return s
