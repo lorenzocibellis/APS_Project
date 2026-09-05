@@ -65,7 +65,7 @@ class RM(Comunication):
         IDclinica, _ , IDpaziente , IDreferto, DdR = m
         ksimc, ksimp , trev, CdR ,creferto = DdR
 
-        if self._existentID(IDclinica) is None:
+        if self._existentID(IDclinica) is False:
             print("Utente non esistente")
             return
 
@@ -96,7 +96,7 @@ class RM(Comunication):
         print(m)
         IDrichiedente, _, IDpaziente, IDreferto, Auth = m
 
-        if self._existentID(IDrichiedente) is None:
+        if self._existentID(IDrichiedente) is False:
             print("Utente non esistente")
             return
 
@@ -194,8 +194,13 @@ class RM(Comunication):
         print("RM: Elaborazione Revoca Referto")
         IDrichiedente, _, IDpaziente, IDreferto, DdR = m
 
-        if self._existentID(IDrichiedente) is None:
+
+        if self._existentID(IDrichiedente) is False:
             print("Utente non esistente")
+            return
+
+        if self._db.isRevoked(IDpaziente, IDreferto):
+            self._notifyMessage(IDrichiedente, nc.INVALID_OP)
             return
 
         if len(DdR) != 5:
@@ -231,8 +236,12 @@ class RM(Comunication):
         print("Elaborazione aggiornamento referto")
         IDrichiedente, _, IDpaziente, IDreferto, DdR = m
 
-        if self._existentID(IDrichiedente) is None:
+        if self._existentID(IDrichiedente) is False:
             print("Utente non esistente")
+            return
+
+        if not self._db.isRevoked(IDpaziente, IDreferto):
+            self._notifyMessage(IDrichiedente, nc.INVALID_OP)
             return
 
         if len(DdR) != 4:
@@ -269,7 +278,7 @@ class RM(Comunication):
         print(m)
         IDrichiedente, _, IDreferto = m
 
-        if self._existentID(IDrichiedente) is None:
+        if self._existentID(IDrichiedente) is False:
             print("Utente non esistente")
             return
 
@@ -316,7 +325,7 @@ class RM(Comunication):
 
         IDrichiedente, _, IDpaziente, IDreferto, Auth = m
 
-        if self._existentID(IDrichiedente) is None:
+        if self._existentID(IDrichiedente) is False:
             print("Utente non esistente")
             return
 

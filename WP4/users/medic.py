@@ -17,19 +17,24 @@ class Medico(User):
             self._auth[IDpaziente] = dict()
         self._auth[IDpaziente][IDreferto] = Auth
 
-    def _storeKeys(self, krev, ksim, IDpaziente):
+    def _storeKeys(self, krev, ksim, IDpaziente, IDreferto):
+        if IDpaziente not in self._krev:
+            self._krev[IDpaziente][IDreferto] = dict()
+        if IDpaziente not in self._ksim:
+            self._ksim[IDpaziente][IDreferto] = dict()
+
         self._krev[IDpaziente] = krev
         self._ksim[IDpaziente] = ksim
 
 
-    def _obtainKey(self, IDpaziente, IDclinica, DdRevoca, DdReferto):
+    def _obtainKey(self, IDpaziente, IDreferto, IDclinica, DdRevoca, DdReferto):
         ksim, krev = super()._obtainKey(IDpaziente, IDclinica, DdRevoca, DdReferto)
         if ksim is None:
-            ksimm = self._ksim[IDpaziente]
+            ksimm = self._ksim[IDpaziente][IDreferto]
             if ksimm is not None:
                 ksim = PiAsim.DecAsim(self._kpriv, ksimm)
         if krev is None:
-            krevm = self._krev[IDpaziente]
+            krevm = self._krev[IDpaziente][IDreferto]
             if krevm is not None:
                 krev = PiAsim.DecAsim(self._kpriv, krevm)
         return ksim, krev
@@ -69,7 +74,7 @@ class Medico(User):
         #spacchettamento messaggio
         IDmittente, _, IDmedico, IDreferto, confirm, token = m
 
-        if self._existentID(IDmittente) is None:
+        if self._existentID(IDmittente) is False:
             print("Utente non esistente")
             return
         if self._ca.getRole(IDmittente) != Role.PAZIENTE:
@@ -109,4 +114,4 @@ class Medico(User):
 
 
         #ottenimento e memorizzazione chiavi
-        self._storeKeys(krevm, ksimm, IDmittente)
+        self._storeKeys(krevm, ksimm, IDmittente, IDreferto)

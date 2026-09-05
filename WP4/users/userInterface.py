@@ -137,7 +137,7 @@ class User(Comunication):
             return
 
         #ottenimento chiavi simmetriche
-        ksim, krev = self._obtainKey(IDpaziente, IDclinica, DdRevoca, DdReferto)
+        ksim, krev = self._obtainKey(IDpaziente, IDreferto, IDclinica, DdRevoca, DdReferto)
 
 
 
@@ -185,7 +185,8 @@ class User(Comunication):
         print(ref)
 
 
-    def _obtainKey(self, IDpaziente, IDclinica, DdRevoca, DdReferto):
+    def _obtainKey(self, IDpaziente, IDreferto, IDclinica, DdRevoca, DdReferto):
+        #IDreferto in questa implementazione non serve a niente, utilizzato per override nel medico
         paziente = IDpaziente
         clinica = IDclinica
         ksim, krev =  DdReferto[0], DdRevoca[0]
