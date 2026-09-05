@@ -13,8 +13,8 @@ def menu_clinica(clinica):
         print("1. Crea e Invia Referto")
         print("2. Revoca Referto")
         print("3. Aggiorna Referto")
-        print("4. Richiedi Referto (ref_request)")
-        print("5. Richiedi Registro di Audit (aud_request)")
+        print("4. Richiedi Referto ")
+        print("5. Richiedi Registro di Audit ")
         print("6. Visualizza Registri di Audit Salvati")
         print("0. Torna al menu principale")
 
@@ -60,9 +60,9 @@ def menu_clinica(clinica):
 def menu_paziente(paziente):
     while True:
         print(f"\n--- MENU PAZIENTE (ID: {paziente._ID}) ---")
-        print("1. Richiedi Chiavi Referto (key_request)")
-        print("2. Richiedi Referto Cifrato (ref_request)")
-        print("3. Richiedi Registro di Audit (aud_request)")
+        print("1. Richiedi Chiavi Referto ")
+        print("2. Richiedi Referto")
+        print("3. Richiedi Registro di Audit ")
         print("4. Visualizza Registri di Audit Salvati")
         print("0. Torna al menu principale")
 
@@ -93,9 +93,9 @@ def menu_paziente(paziente):
 def menu_medico(medico):
     while True:
         print(f"\n--- MENU MEDICO (ID: {medico._ID}) ---")
-        print("1. Richiedi Autorizzazione al Paziente (vis_request)")
-        print("2. Richiedi Referto Cifrato a RM (ref_request)")
-        print("3. Richiedi Registro di Audit a RM (aud_request)")
+        print("1. Richiedi Autorizzazione al Paziente ")
+        print("2. Richiedi Referto Cifrato a RM ")
+        print("3. Richiedi Registro di Audit a RM ")
         print("4. Visualizza Autorizzazioni e Registri Salvati")
         print("0. Torna al menu principale")
 
