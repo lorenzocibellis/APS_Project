@@ -30,7 +30,7 @@ class RM(Comunication):
             self._notifyMessage(sender, nc.INVALID_DATA)
             return
 
-        print("Elaborazione della richiesta")
+        print(self._ID + ": Elaborazione della richiesta")
         if op == oc.STORE:
 
             self._store(m, cnt, signaudit)
@@ -61,7 +61,6 @@ class RM(Comunication):
         if len(m) != 5:
            self._notifyMessage(m[0], nc.INVALID_DATA)
            return
-        print(m)
 
         print("RM: Elaborazione caricamento referto")
         IDclinica, _ , IDpaziente , IDreferto, DdR = m
@@ -80,6 +79,7 @@ class RM(Comunication):
         if kpub is None:
             self._notifyMessage(IDclinica, nc.INVALID_DATA)
         base = [IDreferto, CdR, False]
+
         if not S.Vrfy(kpub, Serializer.serialize(base), trev):
             self._notifyMessage(m[0], nc.INVALID_DATA)
             return
