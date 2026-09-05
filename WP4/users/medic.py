@@ -19,24 +19,26 @@ class Medico(User):
 
     def _storeKeys(self, krev, ksim, IDpaziente, IDreferto):
         if IDpaziente not in self._krev:
-            self._krev[IDpaziente][IDreferto] = dict()
+            self._krev[IDpaziente] = dict()
         if IDpaziente not in self._ksim:
-            self._ksim[IDpaziente][IDreferto] = dict()
+            self._ksim[IDpaziente] = dict()
 
-        self._krev[IDpaziente] = krev
-        self._ksim[IDpaziente] = ksim
+        self._krev[IDpaziente][IDreferto] = krev
+        self._ksim[IDpaziente][IDreferto] = ksim
 
 
     def _obtainKey(self, IDpaziente, IDreferto, IDclinica, DdRevoca, DdReferto):
-        ksim, krev = super()._obtainKey(IDpaziente, IDclinica, DdRevoca, DdReferto)
+        ksim, krev = super()._obtainKey(IDpaziente, IDreferto, IDclinica, DdRevoca, DdReferto)
         if ksim is None:
-            ksimm = self._ksim[IDpaziente][IDreferto]
-            if ksimm is not None:
-                ksim = PiAsim.DecAsim(self._kpriv, ksimm)
+            if IDpaziente in self._ksim and IDreferto in self._ksim[IDpaziente]:
+                ksimm = self._ksim[IDpaziente][IDreferto]
+                if ksimm is not None:
+                    ksim = PiAsim.DecAsim(self._kpriv, ksimm)
         if krev is None:
-            krevm = self._krev[IDpaziente][IDreferto]
-            if krevm is not None:
-                krev = PiAsim.DecAsim(self._kpriv, krevm)
+            if IDpaziente in self._krev and IDreferto in self._krev[IDpaziente]:
+                krevm = self._krev[IDpaziente][IDreferto]
+                if krevm is not None:
+                    krev = PiAsim.DecAsim(self._kpriv, krevm)
         return ksim, krev
 
 
