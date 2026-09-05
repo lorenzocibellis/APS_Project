@@ -207,13 +207,13 @@ def menu_paziente(paziente):
         scelta = input("Seleziona un'operazione: ").strip()
 
         if scelta == "1":
-            id_referto = input("ID Referto Univoco: ").strip()
+            id_referto = input("ID Referto Univoco (es. C0_REF_001): ").strip()
             paziente.key_request(id_referto)
         elif scelta == "2":
-            id_referto = input("ID Referto Univoco: ").strip()
+            id_referto = input("ID Referto Univoco (es. C0_REF_001): ").strip()
             paziente.ref_request(id_referto)
         elif scelta == "3":
-            id_referto = input("ID Referto Univoco: ").strip()
+            id_referto = input("ID Referto Univoco (es. C0_REF_001): ").strip()
             paziente.aud_request(id_referto)
         elif scelta == "4":
             print("\n[Registri di Audit salvati localmente]")
@@ -241,15 +241,15 @@ def menu_medico(medico):
 
         if scelta == "1":
             id_paziente = input("ID Paziente: ").strip()
-            id_referto = input("ID Referto Univoco: ").strip()
+            id_referto = input("ID Referto Univoco (es. C0_REF_001): ").strip()
             medico.vis_request(id_paziente, id_referto)
         elif scelta == "2":
             id_paziente = input("ID Paziente: ").strip()
-            id_referto = input("ID Referto Univoco: ").strip()
+            id_referto = input("ID Referto Univoco (es. C0_REF_001): ").strip()
             medico.ref_request(id_paziente, id_referto)
         elif scelta == "3":
             id_paziente = input("ID Paziente: ").strip()
-            id_referto = input("ID Referto Univoco: ").strip()
+            id_referto = input("ID Referto Univoco (es. C0_REF_001): ").strip()
             medico.aud_request(id_paziente, id_referto)
         elif scelta == "4":
             print("\n[Autorizzazioni Salvate]")
