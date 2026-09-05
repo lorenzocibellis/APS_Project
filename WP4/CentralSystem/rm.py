@@ -338,14 +338,16 @@ class RM(Comunication):
             print("Utente non esistente")
             return
 
+        role = self._ca.getRole(IDrichiedente)
+        if role is None:
+            return
+
         #Controllo che il referto esista in memoria
         if not self._db.exists(IDpaziente,IDreferto):
             self._notifyMessage(IDrichiedente, nc.INEX)
             return
 
-        role = self._ca.getRole(IDrichiedente)
-        if role is None:
-            return
+
 
         IDclinica = self._db.getIDclinica(IDpaziente, IDreferto)
         #CASO SPECIALE: autorizzazione per il medico
