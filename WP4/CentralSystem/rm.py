@@ -95,7 +95,6 @@ class RM(Comunication):
             self._notifyMessage(m[0], nc.INVALID_DATA)
             return
         print("RM: Elaborazione Richiesta Referto")
-        print(m)
         IDrichiedente, _, IDpaziente, IDreferto, Auth = m
 
         if self._existentID(IDrichiedente) is False:
@@ -285,7 +284,7 @@ class RM(Comunication):
             return
 
         print("RM: Elaborazione Invio chiavi")
-        print(m)
+
         IDrichiedente, _, IDreferto = m
 
         if self._existentID(IDrichiedente) is False:
@@ -331,7 +330,7 @@ class RM(Comunication):
             return
 
         print("RM: Elaborazione Richiesta Auditing")
-        print(m)
+        
 
         IDrichiedente, _, IDpaziente, IDreferto, Auth = m
 
