@@ -24,13 +24,15 @@ class RM(Comunication):
         if len(data) != 6:
             return
         m, sender, op, kpub, cnt, signaudit = data
+
+        # controllo sincronizzazione dati tra mittente e messaggio
+        if sender != m[0]:
+            self._notifyMessage(sender, nc.INVALID_DATA)
+            return
+
         print("Elaborazione della richiesta")
         if op == oc.STORE:
-            #controllo sincronizzazione dati tra mittente e messaggio
-            if self._ca.getRole(sender) is None or self._ca.getRole(sender) != Role.CLINICA or sender != m[0]:
-                self._notifyMessage(sender, nc.INVALID_DATA)
-                return
-
+            
             self._store(m, cnt, signaudit)
 
         elif op == oc.REF_REQ:
