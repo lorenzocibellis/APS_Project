@@ -29,7 +29,11 @@ class User(Comunication):
 
 
     def receive(self, c):
-        data = super().receive(c)
+        try:
+            data = super().receive(c)
+        except ValueError as e:
+            self._notify(nc.INVALID_DATA)
+
         if data is None:
             return
         if len(data) != 3:
