@@ -1,3 +1,5 @@
+from io import UnsupportedOperation
+
 from cryptoOperation.cryptOp import PiAsim, PiSim, S
 from cryptoOperation.serializer import Serializer
 from globalClasses.enumerations import OperationCode as oc, NotifyCode as nc
@@ -34,6 +36,7 @@ class Comunication:
             self._kpriv, self._kpub = PiAsim.GenAsim(2048)
             self._ID = self._ca.subscribe(self, self._role, self._kpub)
             self._identity = True
+            self._auditCnt = dict()
             return
         print("Identità già inizializzata")
 
@@ -68,7 +71,6 @@ class Comunication:
         # passo 2
         cnt = self._getcntout(dest)
         cnt = cnt + 1
-
         mcnt = [cnt , m]
 
         self._cntupdateout(dest, cnt)
@@ -88,9 +90,11 @@ class Comunication:
 
         # operazione Audit
         if op in self._auditOp:
-            audit = [m[0] , m[1] , cnt]
-            audit = Serializer.serialize(audit)
-            signaudit = S.Sign(self._kpriv, audit)
+            audit, signaudit, auditCnt = self._getAuditAuth(m)
+            #audit = [m[0] , m[1] , cnt]
+            #audit = Serializer.serialize(audit)
+            #signaudit = S.Sign(self._kpriv, audit)
+            msign.insert(0, auditCnt)
             msign.insert(0,signaudit)
 
 
@@ -125,10 +129,11 @@ class Comunication:
         op = msign[-1][1]
         if op in self._auditOp:
             flag = True
-            signaudit, sign , cnt , m = msign
+            signaudit, auditCnt, sign , cnt , m = msign
         else:
             sign,cnt,m = msign
             signaudit = None
+            auditCnt = None
 
         IDsender = m[0]
         if IDsender not in self._cntin:
@@ -139,7 +144,7 @@ class Comunication:
 
         # passo 5.5
         if signaudit is not None:
-            audit = [m[0] , m[1] , cnt]
+            audit = [m[0] , m[1] , auditCnt]
             saudit = Serializer.serialize(audit)
             if not S.Vrfy(kpub, saudit, signaudit):
                 raise ValueError("Errore nella firma dell'audit")
@@ -158,7 +163,7 @@ class Comunication:
         print(self._ID + ": messaggio autenticato e validato")
 
         if flag:
-            return [m , IDsender, op , kpub , cnt, signaudit]
+            return [m , IDsender, op , kpub , auditCnt, signaudit]
 
         return [m , op, kpub]
 
@@ -175,6 +180,11 @@ class Comunication:
             print(self._ID + ": Operazione non effettuata: operazione non valida")
 
 
+    def _getAuditAuth(self, message):
+        raise UnsupportedOperation
+
+    def _updateAuditCnt(self, message):
+        raise UnsupportedOperation
 
 
 

@@ -100,4 +100,21 @@ class Paziente(User):
         print(self._ID + " : Invio messaggio di risposta")
         self.send(receiver, message)
 
+    def _getAuditAuth(self, message):
+        cnt = self._updateAuditCnt(message)
+        audit = [ message[0], message[1], cnt]
+        signaudit = S.Sign(self._kpriv, Serializer.serialize(audit))
+        return audit, signaudit, cnt
 
+
+    def _updateAuditCnt(self, message):
+        if message[1] == oc.KEY_REQ:
+            IDreferto = message[2]
+        else:
+            IDreferto = message[3]
+
+        if IDreferto not in self._auditCnt:
+            self._auditCnt[IDreferto] = 0
+
+        self._auditCnt[IDreferto] += 1
+        return self._auditCnt[IDreferto]

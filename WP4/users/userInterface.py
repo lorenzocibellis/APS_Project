@@ -110,7 +110,7 @@ class User(Comunication):
             if ID not in control:
                 control[ID] = cnt
             else:
-                if control[ID]  >= cnt:
+                if control[ID]  + 1 != cnt:
                     return False
                 control[ID] = cnt
 
@@ -243,6 +243,23 @@ class User(Comunication):
         IDrm = self._ca.getRMID()
         self.send(IDrm, message)
 
+
+    def _getAuditAuth(self, message):
+        cnt = self._updateAuditCnt(message)
+        audit = [ message[0], message[1], cnt]
+        signaudit = S.Sign( self._kpriv, Serializer.serialize(audit) )
+        return audit, signaudit, cnt
+
+    def _updateAuditCnt(self, message):
+        IDpaziente, IDreferto = message[2], message[3]
+        if IDpaziente not in self._auditCnt:
+            self._auditCnt[IDpaziente] = dict()
+            self._auditCnt[IDpaziente][IDreferto] = 0
+        elif IDreferto not in self._auditCnt[IDpaziente]:
+            self._auditCnt[IDpaziente][IDreferto] = 0
+
+        self._auditCnt[IDpaziente][IDreferto] += 1
+        return self._auditCnt[IDpaziente][IDreferto]
 
 
 
