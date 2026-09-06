@@ -189,11 +189,11 @@ def run_security_tests():
     #impostiamo il bit di revoca a True anche se il referto è ancora valido
     clinica._database[paziente._ID][id_ref][0] = True
 
-    oldcdr = rm._db.getCdR(paziente._ID, id_ref)
+    told = rm._db.getItem(paziente._ID, id_ref)._trev
     clinica.updateReferto(paziente._ID, id_ref, "Referto modificato abusivamente")
 
     #Controllo che il cdr non sia modificato
-    if oldcdr == rm._db.getCdR(paziente._ID, id_ref):
+    if told == rm._db.getItem(paziente._ID, id_ref)._trev:
         print("-> ESITO: [SUPERATO] Il protocollo impedisce la modifica diretta di referti attivi")
         superati += 1
     else:
