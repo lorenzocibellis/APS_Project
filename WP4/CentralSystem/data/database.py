@@ -1,6 +1,3 @@
-#from CentralSystem.rm import RM
-from os.path import exists
-
 from CentralSystem.data.audit import Audit
 from CentralSystem.data.item import Item
 from globalClasses.enumerations import NotifyCode as nc
@@ -59,7 +56,7 @@ class Database:
         return self.getItem(IDpaziente, IDreferto).getCdR()
 
     def isRevoked(self, IDpaziente, IDreferto):
-        if not exists(IDpaziente, IDreferto):
+        if not self.exists(IDpaziente, IDreferto):
             return False
         return self._database[IDpaziente][IDreferto].isRevoked()
 
@@ -70,7 +67,7 @@ class Database:
 
     def __contains__(self, item):
         p , r = item.getIDpaziente() , item.getIDreferto()
-        if not exists(p, r):
+        if not self.exists(p, r):
             return False
         return self._database[p][r] is not None
 
