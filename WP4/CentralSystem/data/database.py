@@ -1,6 +1,9 @@
 #from CentralSystem.rm import RM
+from os.path import exists
+
 from CentralSystem.data.audit import Audit
 from CentralSystem.data.item import Item
+from globalClasses.enumerations import NotifyCode as nc
 
 class Database:
 
@@ -10,29 +13,25 @@ class Database:
     def addItem(self, IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica,trev, CdR,crevoca, creferto):
         item = Item(IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica, trev, CdR ,crevoca, creferto)
         if item in self:
-            return "01"
+            return nc.INVALID_DATA
         if IDpaziente not in self._database:
             self._database[IDpaziente] = dict()
         self._database[IDpaziente][IDreferto] = item
 
-        return "00"
+        return nc.SUCCESS
 
     def revokeItem(self, IDpaziente, IDreferto, krevpaziente, krevclinica, trev, CdR, crevoca):
-        if IDpaziente not in self._database:
-            return "03"
-        if IDreferto not in self._database[IDpaziente]:
-            return "03"
+        if not self.exists(IDpaziente, IDreferto):
+            return nc.INEX
         self._database[IDpaziente][IDreferto].revokeItem(krevpaziente, krevclinica, trev, CdR, crevoca)
-        return "00"
+        return nc.SUCCESS
 
 
     def updateItem(self, IDpaziente, IDreferto, ksimpaziente, ksimclinica, trev, creferto):
-        if IDpaziente not in self._database:
-            return "03"
-        if IDreferto not in self._database[IDpaziente]:
-            return "03"
+        if not self.exists(IDpaziente, IDreferto):
+            return nc.INEX
         self._database[IDpaziente][IDreferto].updateItem(ksimpaziente, ksimclinica, trev, creferto)
-        return "00"
+        return nc.SUCCESS
 
     def addAudit(self,IDpaziente,IDreferto,ID, op, cnt, signaudit ):
         item = self._database[IDpaziente][IDreferto]
@@ -60,9 +59,7 @@ class Database:
         return self.getItem(IDpaziente, IDreferto).getCdR()
 
     def isRevoked(self, IDpaziente, IDreferto):
-        if IDpaziente not in self._database:
-            return False
-        if IDreferto not in self._database[IDpaziente]:
+        if not exists(IDpaziente, IDreferto):
             return False
         return self._database[IDpaziente][IDreferto].isRevoked()
 
@@ -73,9 +70,7 @@ class Database:
 
     def __contains__(self, item):
         p , r = item.getIDpaziente() , item.getIDreferto()
-        if p not in self._database:
-            return False
-        if r not in self._database[p]:
+        if not exists(p, r):
             return False
         return self._database[p][r] is not None
 
