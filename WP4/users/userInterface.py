@@ -108,6 +108,8 @@ class User(Comunication):
 
             #controllo sui contatori
             if ID not in control:
+                if cnt != 1:
+                    return False
                 control[ID] = cnt
             else:
                 if control[ID]  + 1 != cnt:

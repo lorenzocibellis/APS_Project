@@ -91,11 +91,8 @@ class Comunication:
         # operazione Audit
         if op in self._auditOp:
             audit, signaudit, auditCnt = self._getAuditAuth(m)
-            #audit = [m[0] , m[1] , cnt]
-            #audit = Serializer.serialize(audit)
-            #signaudit = S.Sign(self._kpriv, audit)
             msign.insert(0, auditCnt)
-            msign.insert(0,signaudit)
+            msign.insert(0, signaudit)
 
 
         # passo 6
