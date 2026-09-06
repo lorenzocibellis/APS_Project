@@ -20,6 +20,7 @@ class Comunication:
         self._obtainIdentity()
         self._cntout = dict()
         self._cntin = dict()
+        self._auditCnt = dict()
 
 
     def _notifyMessage(self, receiver, code):
@@ -36,7 +37,6 @@ class Comunication:
             self._kpriv, self._kpub = PiAsim.GenAsim(2048)
             self._ID = self._ca.subscribe(self, self._role, self._kpub)
             self._identity = True
-            self._auditCnt = dict()
             return
         print("Identità già inizializzata")
 
