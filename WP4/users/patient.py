@@ -113,8 +113,8 @@ class Paziente(User):
         else:
             IDreferto = message[3]
 
-        if IDreferto not in self._auditCnt:
-            self._auditCnt[IDreferto] = 0
+        if IDreferto not in self._cntAudit:
+            self._cntAudit[IDreferto] = 0
 
-        self._auditCnt[IDreferto] += 1
-        return self._auditCnt[IDreferto]
+        self._cntAudit[IDreferto] += 1
+        return self._cntAudit[IDreferto]

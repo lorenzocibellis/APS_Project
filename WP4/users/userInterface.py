@@ -254,14 +254,14 @@ class User(Comunication):
 
     def _updateAuditCnt(self, message):
         IDpaziente, IDreferto = message[2], message[3]
-        if IDpaziente not in self._auditCnt:
-            self._auditCnt[IDpaziente] = dict()
-            self._auditCnt[IDpaziente][IDreferto] = 0
-        elif IDreferto not in self._auditCnt[IDpaziente]:
-            self._auditCnt[IDpaziente][IDreferto] = 0
+        if IDpaziente not in self._cntAudit:
+            self._cntAudit[IDpaziente] = dict()
+            self._cntAudit[IDpaziente][IDreferto] = 0
+        elif IDreferto not in self._cntAudit[IDpaziente]:
+            self._cntAudit[IDpaziente][IDreferto] = 0
 
-        self._auditCnt[IDpaziente][IDreferto] += 1
-        return self._auditCnt[IDpaziente][IDreferto]
+        self._cntAudit[IDpaziente][IDreferto] += 1
+        return self._cntAudit[IDpaziente][IDreferto]
 
 
 

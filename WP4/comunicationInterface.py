@@ -20,7 +20,7 @@ class Comunication:
         self._obtainIdentity()
         self._cntout = dict()
         self._cntin = dict()
-        self._auditCnt = dict()
+        self._cntAudit = dict()
 
 
     def _notifyMessage(self, receiver, code):
