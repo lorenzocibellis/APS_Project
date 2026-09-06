@@ -7,7 +7,7 @@ class Database:
     def __init__(self):
         self._database = dict()
 
-    def addItem(self, IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica,trev, CdR,crevoca, creferto , verbose = False):
+    def addItem(self, IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica,trev, CdR,crevoca, creferto):
         item = Item(IDpaziente, IDreferto, IDclinica, ksimpaziente, ksimclinica, krevpaziente, krevclinica, trev, CdR ,crevoca, creferto)
         if item in self:
             return "01"
@@ -15,9 +15,6 @@ class Database:
             self._database[IDpaziente] = dict()
         self._database[IDpaziente][IDreferto] = item
 
-        #modalità verbose
-        if verbose:
-            print("\nAggiunto item:\n" + str(item) +"\n")
         return "00"
 
     def revokeItem(self, IDpaziente, IDreferto, krevpaziente, krevclinica, trev, CdR, crevoca):

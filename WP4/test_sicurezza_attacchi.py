@@ -185,14 +185,22 @@ def run_security_tests():
     print("Simulazione: La clinica tenta di sovrascrivere direttamente un referto")
     print("attivo senza aver prima depositato la formale Motivazione di Revoca (MdR).")
 
-    clinica.updateReferto(paziente._ID, id_ref, "Referto modificato abusivamente")
-    is_revoked = clinica._database[paziente._ID][id_ref][0]
+    #simulazione di una clinica che invia un aggiornamento senza aver revocato un referto
+    #impostiamo il bit di revoca a True anche se il referto è ancora valido
+    clinica._database[paziente._ID][id_ref][0] = True
 
-    if not is_revoked:
+    oldcdr = rm._db.getCdR(paziente._ID, id_ref)
+    clinica.updateReferto(paziente._ID, id_ref, "Referto modificato abusivamente")
+
+    #Controllo che il cdr non sia modificato
+    if oldcdr == rm._db.getCdR(paziente._ID, id_ref):
         print("-> ESITO: [SUPERATO] Il protocollo impedisce la modifica diretta di referti attivi")
         superati += 1
     else:
         print("-> ESITO: [FALLITO] Aggiornamento illecito consentito")
+
+    #reset dello stato originale
+    clinica._database[paziente._ID][id_ref][0] = False
 
 
     # RIEPILOGO FINALE
