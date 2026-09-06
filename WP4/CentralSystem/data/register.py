@@ -2,15 +2,17 @@ from cryptoOperation.cryptOp import H
 from cryptoOperation.serializer import Serializer
 
 class Register:
-    def __init__(self, genesis=b"0000"):
+    def __init__(self):
         self._register = []
-        self._g = genesis
+        self._g = None
 
-    def addAudit(self, a):
+    def addAudit(self, a, IDpaziente, IDreferto):
         if a is None:
             raise ValueError
         l = len(self._register)
         if l == 0:
+            base = [IDpaziente, IDreferto]
+            self._g = H.Hash(Serializer.serialize(base))
             self._register.append((a, H.Hash(a.serialize() + b"|" + self._g)))
         else:
             self._register.append((a, H.Hash(a.serialize() + b"|" + self._register[l - 1][1])))
@@ -18,7 +20,7 @@ class Register:
     def getAudit(self, index):
         if index >= len(self._register):
             print("Index Out Of Bounds")
-            return
+            return None, None
 
         return self._register[index]
 
@@ -37,7 +39,7 @@ class Register:
         return Serializer.deserialize(serializedRegister)
 
     def __str__(self):
-        s = "REGISTRO:\n"
+        s = "REGISTRO:\nGenesis: " + self._g + "\n"
         i = 0
         for (audit, hash) in self._register:
             s = s + "\nAudit " + str(i) + ": \n" + str(audit) + "\nHash: " + str(hash) + "\n"

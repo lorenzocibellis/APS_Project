@@ -166,7 +166,7 @@ def run_security_tests():
     vecchio_cnt = audit_0._cnt
     audit_0._cnt = 999999
 
-    valid = paziente._verifyRegister(registro)
+    valid = paziente._verifyRegister(registro,paziente._ID, id_ref)
     # ripristino
     audit_0._cnt = vecchio_cnt
 

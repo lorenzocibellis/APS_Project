@@ -30,9 +30,9 @@ class Database:
         self._database[IDpaziente][IDreferto].updateItem(ksimpaziente, ksimclinica, trev, creferto)
         return nc.SUCCESS
 
-    def addAudit(self,IDpaziente,IDreferto,ID, op, cnt, signaudit ):
+    def addAudit(self,IDpaziente,IDreferto, IDrichiedente, op, cnt, signaudit ):
         item = self._database[IDpaziente][IDreferto]
-        item.addAudit( Audit(ID, op, cnt, signaudit) )
+        item.addAudit( Audit(IDrichiedente, op, cnt, signaudit), IDpaziente, IDreferto )
 
     def getItem(self, IDpaziente, IDreferto):
         return self._database[IDpaziente][IDreferto]

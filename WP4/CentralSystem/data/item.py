@@ -34,8 +34,8 @@ class Item:
         self._creferto = creferto
         return
 
-    def addAudit(self, audit):
-        self._register.addAudit(audit)
+    def addAudit(self, audit, IDpaziente, IDreferto):
+        self._register.addAudit(audit, IDpaziente, IDreferto)
 
     def isRevoked(self):
         return self._flagRevoca

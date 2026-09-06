@@ -76,7 +76,7 @@ class User(Comunication):
         #Spacchettamento messaggio
         IDsender, _, IDpaziente, IDreferto, register = message
 
-        if not self._verifyRegister(register):
+        if not self._verifyRegister(register, IDpaziente, IDreferto):
             self._notify(nc.INVALID_DATA)
             return
         else:
@@ -94,8 +94,11 @@ class User(Comunication):
                 self._registers[IDpaziente] = dict()
             self._registers[IDpaziente][IDreferto] = register
 
-    def _verifyRegister(self,r):
+    def _verifyRegister(self,r, IDpaziente,IDreferto):
         control = dict()
+        #un registro contiene sempre almeno 1 elemento (la creazione del referto)
+        if len(r) <= 0:
+            return False
         for index in range(len(r)):
             audit, hash = r.getAudit(index)
 
@@ -118,6 +121,8 @@ class User(Comunication):
 
             if index == 0:
                 precHash = r.getGenesis()
+                if not H.HVrfy(Serializer.serialize([IDpaziente, IDreferto]) , precHash):
+                    return False
             else:
                 _, precHash = r.getAudit(index - 1)
 
