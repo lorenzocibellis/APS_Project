@@ -67,13 +67,18 @@ def run_security_tests():
     paziente.ref_request(id_ref)
     captured_packet = packets_to_rm[-1]
 
-    try:
-        rm.receive(captured_packet)
-        print("-> ESITO: [FALLITO] L'attacco Replay non è stato intercettato!")
-    except ValueError as e:
-        assert "Attacco Replay" in str(e)
-        print(f"-> ESITO: [SUPERATO] Bloccato con successo da RM: \"{e}\"")
+    notifiche_rm = []
+    orig_rm_notify = rm._notify
+    rm._notify = lambda code: (notifiche_rm.append(code), orig_rm_notify(code))
+
+    rm.receive(captured_packet)
+    rm._notify = orig_rm_notify
+
+    if notifiche_rm and notifiche_rm[-1] == nc.INVALID_DATA:
+        print("-> ESITO: [SUPERATO] Bloccato con successo da RM (pacchetto replay rilevato e scartato)")
         superati += 1
+    else:
+        print("-> ESITO: [FALLITO] L'attacco Replay non è stato intercettato")
 
     ca._cc.send = orig_send
 
