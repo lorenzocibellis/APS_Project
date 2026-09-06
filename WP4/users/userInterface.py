@@ -160,26 +160,30 @@ class User(Comunication):
             return
 
         #Estrazione documento
-        mreferto = PiSim.DecSim(ksim, creferto)
-        mreferto = Serializer.deserialize(mreferto)
-        signreferto, referto = mreferto
-        if FdR:
-            mrevoca = PiSim.DecSim(krev, crevoca)
-            mrevoca = Serializer.deserialize(mrevoca)
-            signrevoca, MdR = mrevoca
-            #verifica revoca
-            if not S.Vrfy(kpub, Serializer.serialize(MdR), signrevoca):
-                self._notify(nc.INVALID_DATA)
-                return
-        else:
-            MdR = None
+        try:
+            mreferto = PiSim.DecSim(ksim, creferto)
+            mreferto = Serializer.deserialize(mreferto)
+            signreferto, referto = mreferto
+            if FdR:
+                mrevoca = PiSim.DecSim(krev, crevoca)
+                mrevoca = Serializer.deserialize(mrevoca)
+                signrevoca, MdR = mrevoca
+                #verifica revoca
+                if not S.Vrfy(kpub, Serializer.serialize(MdR), signrevoca):
+                    self._notify(nc.INVALID_DATA)
+                    return
+            else:
+                MdR = None
+        except:
+            print(self._ID + ": Chiavi non valide, richiedere nuove chiavi")
+            return
 
         #verifica del referto
         if not S.Vrfy(kpub, Serializer.serialize(referto), signreferto):
             self._notify(nc.INVALID_DATA)
             return
 
-        print("Documenti ottenuti validi!")
+        print(self._ID + ": Documenti ottenuti validi!")
         self._printDocuments(referto, FdR, MdR)
 
 
