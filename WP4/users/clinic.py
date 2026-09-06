@@ -92,6 +92,8 @@ class Clinica(User):
         if self._existentID(IDpaziente) is False:
             print("Utente non esistente")
             return
+        if not IDreferto.startswith(self._ID + "_"):
+            IDreferto = self._ID + "_" + IDreferto
         if IDpaziente not in self._database:
             print("Referto non esistente")
             return
@@ -139,6 +141,8 @@ class Clinica(User):
         if self._existentID(IDpaziente) is False:
             print("Utente non esistente")
             return
+        if not IDreferto.startswith(self._ID + "_"):
+            IDreferto = self._ID + "_" + IDreferto
         if IDpaziente not in self._database:
             print("Referto non esistente")
             return
