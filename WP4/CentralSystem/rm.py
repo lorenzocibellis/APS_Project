@@ -69,6 +69,11 @@ class RM(Comunication):
 
         print("RM: Elaborazione caricamento referto")
         IDclinica, _ , IDpaziente , IDreferto, DdR = m
+
+        if len(DdR) != 5:
+            self._notifyMessage(IDclinica, nc.INVALID_DATA)
+            return
+        
         ksimc, ksimp , trev, CdR ,creferto = DdR
 
         if self._existentID(IDclinica) is False:
