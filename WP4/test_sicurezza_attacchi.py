@@ -192,7 +192,7 @@ def run_security_tests():
     told = rm._db.getItem(paziente._ID, id_ref)._trev
     clinica.updateReferto(paziente._ID, id_ref, "Referto modificato abusivamente")
 
-    #Controllo che il cdr non sia modificato
+    #Controllo che il token di validazione non sia modificato
     if told == rm._db.getItem(paziente._ID, id_ref)._trev:
         print("-> ESITO: [SUPERATO] Il protocollo impedisce la modifica diretta di referti attivi")
         superati += 1
