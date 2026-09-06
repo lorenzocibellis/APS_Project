@@ -39,7 +39,7 @@ class Register:
         return Serializer.deserialize(serializedRegister)
 
     def __str__(self):
-        s = "REGISTRO:\nGenesis: " + self._g + "\n"
+        s = "REGISTRO:\nGenesis: " + str(self._g) + "\n"
         i = 0
         for (audit, hash) in self._register:
             s = s + "\nAudit " + str(i) + ": \n" + str(audit) + "\nHash: " + str(hash) + "\n"

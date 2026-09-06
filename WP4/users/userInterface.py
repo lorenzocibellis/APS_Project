@@ -121,7 +121,10 @@ class User(Comunication):
 
             if index == 0:
                 precHash = r.getGenesis()
-                if not H.HVrfy(Serializer.serialize([IDpaziente, IDreferto]) , precHash):
+                if precHash is None or not H.HVrfy(Serializer.serialize([IDpaziente, IDreferto]) , precHash):
+                    return False
+
+                if audit.getOp() != oc.STORE:
                     return False
             else:
                 _, precHash = r.getAudit(index - 1)
